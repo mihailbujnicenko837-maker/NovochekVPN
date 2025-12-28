@@ -29,7 +29,54 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            overflow-x: hidden; /* Чтобы гирлянда не делала скролл */
         }
+
+        /* 🎄 НОВОГОДНЯЯ ГИРЛЯНДА (CSS Анимация) */
+        .lightrope {
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            position: absolute;
+            z-index: 1;
+            margin: -20px 0 0 0;
+            padding: 0;
+            pointer-events: none;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .lightrope li {
+            position: relative;
+            list-style: none;
+            margin: 0 12px;
+            padding: 0;
+            display: block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-bottom: 20px; /* Длина нити */
+            background: #fff;
+            animation-name: flash;
+            animation-duration: 2s;
+            animation-iteration-count: infinite;
+            box-shadow: 0px 5px 20px 3px #fff;
+        }
+
+        /* Цвета лампочек */
+        .lightrope li:nth-child(2n+1) { background: #00ff22; box-shadow: 0px 5px 20px 3px #00ff22; animation-duration: 1s; }
+        .lightrope li:nth-child(4n+2) { background: #ff0015; box-shadow: 0px 5px 20px 3px #ff0015; animation-duration: 1.5s; }
+        .lightrope li:nth-child(3n+4) { background: #ffd900; box-shadow: 0px 5px 20px 3px #ffd900; animation-duration: 2.2s; }
+        .lightrope li:nth-child(odd) { animation-duration: 1.8s; }
+
+        /* Анимация мигания */
+        @keyframes flash {
+            0%, 100% { opacity: 1; transform: scale(1.1); }
+            50% { opacity: 0.3; transform: scale(0.9); }
+        }
+
+        /* --- КОНЕЦ ГИРЛЯНДЫ --- */
 
         .header {
             width: 100%;
@@ -37,6 +84,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            margin-top: 20px; /* Отступ от гирлянды */
         }
 
         .user-welcome { font-weight: bold; font-size: 20px; }
@@ -133,7 +181,10 @@
             justify-content: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
+            transition: background 0.2s;
         }
+        
+        .action-card:active { background: rgba(255, 255, 255, 0.15); }
         
         .action-card i { font-size: 24px; margin-bottom: 8px; color: #fff; }
         .action-card span { font-size: 12px; color: rgba(255, 255, 255, 0.7); }
@@ -155,7 +206,6 @@
         .plan-name { font-weight: bold; font-size: 14px; color: var(--success-color); }
         .plan-exp { font-size: 11px; color: rgba(255, 255, 255, 0.6); }
 
-        /* Кнопка поддержки */
         .support-btn {
             background: transparent;
             border: 1px solid rgba(255,255,255,0.1);
@@ -164,7 +214,7 @@
             border-radius: 12px;
             color: var(--gray-text);
             font-size: 14px;
-            margin-top: auto; /* Прижать к низу */
+            margin-top: auto; 
             margin-bottom: 10px;
             cursor: pointer;
             display: flex;
@@ -177,6 +227,11 @@
     </style>
 </head>
 <body>
+
+    <!-- 🎄 ГИРЛЯНДА -->
+    <ul class="lightrope">
+        <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+    </ul>
 
     <div class="header">
         <div class="user-welcome">Привет, <span id="username">...</span> 👋</div>
@@ -208,18 +263,19 @@
 
     <p style="margin-top: 25px; font-size: 14px; color: rgba(255,255,255,0.4);">Скачать приложение:</p>
 
+    <!-- ССЫЛКИ НА МАГАЗИНЫ -->
     <div class="quick-actions">
-        <div class="action-card" onclick="openInstruction('ios')">
+        <div class="action-card" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')">
             <i class="fab fa-apple"></i>
             <span>iPhone</span>
         </div>
-        <div class="action-card" onclick="openInstruction('android')">
+        <div class="action-card" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android&hl=ru&pli=1')">
             <i class="fab fa-android"></i>
             <span>Android</span>
         </div>
     </div>
 
-    <!-- Кнопка поддержки -->
+    <!-- Кнопка поддержки (ссылка на тебя) -->
     <button class="support-btn" onclick="openSupport()">
         <i class="fas fa-headset"></i> Возникли вопросы? Поддержка
     </button>
@@ -244,7 +300,7 @@
                 document.getElementById('cityText').innerText = "Россия";
             });
 
-        // 3. Подписка (Имитация)
+        // 3. Логика кнопки "Купить" (Заглушка)
         function buySubscription() {
             const btn = document.getElementById('mainBtn');
             const card = document.getElementById('statusCard');
@@ -260,7 +316,7 @@
                 
                 document.querySelector('.status-text').innerText = "Доступ открыт!";
                 document.getElementById('ipText').style.display = 'none';
-                document.querySelector('.sub-text').innerText = "Установите приложение ниже";
+                document.querySelector('.sub-text').innerText = "Ключ выслан ботом";
                 
                 document.getElementById('planInfo').style.display = 'flex';
                 
@@ -271,19 +327,9 @@
             }, 1000);
         }
 
-        function openInstruction(platform) {
-            tg.showPopup({
-                title: 'Инструкция ' + platform,
-                message: '1. Скачайте v2RayTun\n2. Получите ключ у бота\n3. Вставьте ключ в приложение.',
-                buttons: [{type: 'ok'}]
-            });
-        }
-
-        // 4. ФУНКЦИЯ ПОДДЕРЖКИ
+        // 4. ФУНКЦИЯ ПОДДЕРЖКИ (Твой ник)
         function openSupport() {
-            // !!! ВСТАВЬ СЮДА СВОЙ НИКНЕЙМ ТЕЛЕГРАМ (без @) !!!
-            // Например: https://t.me/novochek_admin
-            tg.openTelegramLink('https://t.me/MihailBujnicenko'); 
+            tg.openTelegramLink('https://t.me/Ajdaha61'); 
         }
     </script>
 </body>
