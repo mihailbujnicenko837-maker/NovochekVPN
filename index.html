@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>City VPN</title>
+    <title>City VPN - New Year</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #007AFF; 
             --bg-color: #0f0f13;
             --card-bg: rgba(255, 255, 255, 0.08);
             --text-color: #ffffff;
-            --success-color: #34C759;
-            --danger-color: #ff3b30;
-            --gray-text: #8e8e93;
+            --success-color: #32d74b;
+            --danger-color: #ff453a;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top right, #004a9933, transparent), radial-gradient(circle at bottom left, #99004533, transparent);
+            /* Зимний ночной градиент */
+            background-image: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #b21f1f 100%);
+            background-size: cover;
+            background-attachment: fixed;
             color: var(--text-color);
             margin: 0;
             padding: 20px;
@@ -29,308 +31,382 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            overflow-x: hidden; /* Чтобы гирлянда не делала скролл */
+            overflow-x: hidden;
+            position: relative;
         }
 
-        /* 🎄 НОВОГОДНЯЯ ГИРЛЯНДА (CSS Анимация) */
+        /* --- ❄️ СНЕГ --- */
+        #snow-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- 🎄 ГИРЛЯНДА --- */
         .lightrope {
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             position: absolute;
-            z-index: 1;
-            margin: -20px 0 0 0;
-            padding: 0;
-            pointer-events: none;
+            z-index: 10;
+            top: -15px;
             width: 100%;
+            margin: 0; padding: 0;
+            pointer-events: none;
             display: flex;
             justify-content: center;
         }
-
         .lightrope li {
             position: relative;
             list-style: none;
             margin: 0 12px;
             padding: 0;
             display: block;
-            width: 12px;
-            height: 12px;
+            width: 12px; height: 12px;
             border-radius: 50%;
-            margin-bottom: 20px; /* Длина нити */
             background: #fff;
-            animation-name: flash;
-            animation-duration: 2s;
+            animation-fill-mode: both;
             animation-iteration-count: infinite;
-            box-shadow: 0px 5px 20px 3px #fff;
         }
-
-        /* Цвета лампочек */
-        .lightrope li:nth-child(2n+1) { background: #00ff22; box-shadow: 0px 5px 20px 3px #00ff22; animation-duration: 1s; }
-        .lightrope li:nth-child(4n+2) { background: #ff0015; box-shadow: 0px 5px 20px 3px #ff0015; animation-duration: 1.5s; }
-        .lightrope li:nth-child(3n+4) { background: #ffd900; box-shadow: 0px 5px 20px 3px #ffd900; animation-duration: 2.2s; }
-        .lightrope li:nth-child(odd) { animation-duration: 1.8s; }
-
-        /* Анимация мигания */
-        @keyframes flash {
-            0%, 100% { opacity: 1; transform: scale(1.1); }
-            50% { opacity: 0.3; transform: scale(0.9); }
+        /* Провод */
+        .lightrope li:before {
+            content: "";
+            position: absolute;
+            background: #222;
+            width: 30px; height: 2px;
+            border-radius: 50%;
+            top: -2px; left: -14px;
+            z-index: -1;
         }
+        .lightrope li:nth-child(2n+1) { background: #00ff22; box-shadow: 0 2px 15px #00ff22; animation: flash 2s infinite alternate; }
+        .lightrope li:nth-child(4n+2) { background: #ff0015; box-shadow: 0 2px 15px #ff0015; animation: flash 2.5s infinite alternate; }
+        .lightrope li:nth-child(3n+4) { background: #00eaff; box-shadow: 0 2px 15px #00eaff; animation: flash 1.5s infinite alternate; }
+        @keyframes flash { 0% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.4; transform: scale(0.9); } }
 
-        /* --- КОНЕЦ ГИРЛЯНДЫ --- */
+        /* --- КОНТЕЙНЕР --- */
+        .content {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         .header {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            margin-top: 20px; /* Отступ от гирлянды */
+            margin-bottom: 25px;
+            margin-top: 30px;
         }
-
-        .user-welcome { font-weight: bold; font-size: 20px; }
-
+        .user-welcome { font-weight: 800; font-size: 20px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .geo-badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px 12px;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 12px;
+            border-radius: 15px;
             font-size: 12px;
-            font-weight: 500;
-            color: #aaa;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; gap: 5px;
         }
 
+        /* --- СТАТУС --- */
         .status-card {
             width: 100%;
-            background: var(--card-bg);
+            background: rgba(20, 20, 25, 0.7);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 30px 20px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3); /* Красная рамка по умолчанию */
             margin-bottom: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-
-        .status-card.danger {
-            border-color: rgba(255, 59, 48, 0.3);
-            box-shadow: 0 0 20px rgba(255, 59, 48, 0.1);
-        }
-
-        .status-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            color: var(--danger-color); 
-            transition: color 0.3s;
-        }
-
-        .status-text { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
-        
-        .ip-text {
-            font-size: 14px;
-            color: #ff3b30;
-            background: rgba(255, 59, 48, 0.1);
-            padding: 4px 10px;
+        .status-icon { font-size: 48px; margin-bottom: 15px; color: var(--danger-color); transition: 0.3s; }
+        .status-text { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+        .ip-badge {
+            font-size: 13px;
+            background: rgba(255, 59, 48, 0.15);
+            color: #ff6b6b;
+            padding: 6px 12px;
             border-radius: 8px;
             display: inline-block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-family: monospace;
         }
+        .sub-text { font-size: 13px; color: rgba(255, 255, 255, 0.6); }
 
-        .sub-text { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
-
+        /* --- КНОПКА КУПИТЬ --- */
         .main-btn {
-            background: linear-gradient(135deg, #007AFF, #0055b3);
+            background: linear-gradient(135deg, #007AFF, #00C6FF);
             border: none;
             width: 100%;
             padding: 18px;
             border-radius: 16px;
             color: white;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
-            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+            transition: transform 0.1s;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
+            position: relative;
+            overflow: hidden;
         }
-        .main-btn:active { transform: scale(0.98); }
+        .main-btn:active { transform: scale(0.97); }
+        /* Блик на кнопке */
+        .main-btn::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg); animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
 
+        /* --- ССЫЛКИ --- */
+        .section-label {
+            margin: 25px 0 10px 0;
+            font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; width: 100%;
+        }
         .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
         }
-
         .action-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            transition: background 0.2s;
         }
-        
-        .action-card:active { background: rgba(255, 255, 255, 0.15); }
-        
-        .action-card i { font-size: 24px; margin-bottom: 8px; color: #fff; }
-        .action-card span { font-size: 12px; color: rgba(255, 255, 255, 0.7); }
+        .action-card:active { background: rgba(255, 255, 255, 0.1); }
+        .action-card i { font-size: 22px; margin-bottom: 5px; color: #fff; }
+        .action-card span { font-size: 11px; color: rgba(255, 255, 255, 0.7); }
 
-        .plan-info {
-            width: 100%;
-            background: rgba(52, 199, 89, 0.1);
-            border: 1px solid rgba(52, 199, 89, 0.2);
-            border-radius: 16px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-        
-        .plan-details { display: flex; flex-direction: column; }
-        .plan-name { font-weight: bold; font-size: 14px; color: var(--success-color); }
-        .plan-exp { font-size: 11px; color: rgba(255, 255, 255, 0.6); }
-
-        .support-btn {
+        /* --- НИЖНИЕ КНОПКИ --- */
+        .footer-btns { display: flex; gap: 10px; width: 100%; margin-top: 15px; margin-bottom: 20px; }
+        .btn-outline {
+            flex: 1;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.1);
-            width: 100%;
-            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 12px;
             border-radius: 12px;
-            color: var(--gray-text);
-            font-size: 14px;
-            margin-top: auto; 
-            margin-bottom: 10px;
+            color: #ccc;
+            font-size: 13px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .support-btn:active { background: rgba(255,255,255,0.05); }
 
+        /* --- МОДАЛКА ИНСТРУКЦИИ --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            display: none; justify-content: center; align-items: center;
+            padding: 20px; backdrop-filter: blur(8px);
+        }
+        .modal {
+            background: #1c1c1e;
+            width: 100%; max-width: 340px;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal h3 { margin-top: 0; color: #fff; text-align: center; }
+        .step { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-start; }
+        .step-num {
+            background: var(--primary-color);
+            min-width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; margin-top: 2px;
+        }
+        .step-text { font-size: 13px; line-height: 1.4; color: #ccc; }
+        .close-modal {
+            background: #333; border: none; width: 100%; padding: 12px;
+            border-radius: 12px; color: #fff; margin-top: 15px; font-weight: bold; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 🎄 ГИРЛЯНДА -->
+    <canvas id="snow-canvas"></canvas>
     <ul class="lightrope">
         <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
     </ul>
 
-    <div class="header">
-        <div class="user-welcome">Привет, <span id="username">...</span> 👋</div>
-        <div class="geo-badge" id="geoBadge">
-            <i class="fas fa-location-arrow"></i> <span id="cityText">...</span>
+    <div class="content">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="user-welcome">Привет, <span id="username">...</span> 👋</div>
+            <div class="geo-badge">
+                <i class="fas fa-location-arrow"></i> <span id="cityText">...</span>
+            </div>
+        </div>
+
+        <!-- Статус -->
+        <div class="status-card" id="statusCard">
+            <div class="status-icon"><i class="fas fa-unlock-alt"></i></div>
+            <div class="status-text">Вы не защищены</div>
+            <div class="ip-badge" id="ipText">IP: Определяем...</div>
+            <div class="sub-text">Ваши данные могут перехватить</div>
+        </div>
+
+        <!-- Кнопка купить -->
+        <button class="main-btn" onclick="startPaymentProcess()" id="mainBtn">
+            <i class="fas fa-shield-alt"></i> КУПИТЬ ЗАЩИТУ
+        </button>
+
+        <div class="section-label">Скачать приложение</div>
+        <div class="quick-actions">
+            <div class="action-card" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')">
+                <i class="fab fa-apple"></i> <span>iPhone</span>
+            </div>
+            <div class="action-card" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android')">
+                <i class="fab fa-android"></i> <span>Android</span>
+            </div>
+        </div>
+
+        <div class="footer-btns">
+            <button class="btn-outline" onclick="openInstruction()">
+                <i class="fas fa-book"></i> Инструкция
+            </button>
+            <button class="btn-outline" onclick="openSupport()">
+                <i class="fas fa-headset"></i> Поддержка
+            </button>
         </div>
     </div>
 
-    <!-- Карточка статуса -->
-    <div class="status-card danger" id="statusCard">
-        <div class="status-icon" id="statusIcon"><i class="fas fa-unlock-alt"></i></div>
-        <div class="status-text">Вы не защищены</div>
-        <div class="ip-text" id="ipText">IP видим</div>
-        <div class="sub-text" id="subText">Ваши данные под угрозой</div>
-    </div>
-
-    <!-- Индикатор тарифа (скрыт) -->
-    <div class="plan-info" id="planInfo" style="display:none;">
-        <div class="plan-details">
-            <span class="plan-name">🚀 Личная подписка</span>
-            <span class="plan-exp">Ключ активен</span>
-        </div>
-        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
-    </div>
-
-    <button class="main-btn" onclick="buySubscription()" id="mainBtn">
-        <i class="fas fa-shield-alt"></i> ПОЛУЧИТЬ ДОСТУП
-    </button>
-
-    <p style="margin-top: 25px; font-size: 14px; color: rgba(255,255,255,0.4);">Скачать приложение:</p>
-
-    <!-- ССЫЛКИ НА МАГАЗИНЫ -->
-    <div class="quick-actions">
-        <div class="action-card" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')">
-            <i class="fab fa-apple"></i>
-            <span>iPhone</span>
-        </div>
-        <div class="action-card" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android&hl=ru&pli=1')">
-            <i class="fab fa-android"></i>
-            <span>Android</span>
+    <!-- Модальное окно инструкции -->
+    <div class="modal-overlay" id="instructionModal">
+        <div class="modal">
+            <h3>🚀 Как подключить?</h3>
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">Нажмите <b>"Купить защиту"</b>. Вас перекинет к администратору.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">Оплатите тариф и получите <b>Ключ доступа</b> (он начинается с <code>vless://...</code>).</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">Скопируйте ключ. Откройте приложение <b>V2RayTun</b>.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">Приложение само предложит добавить ключ. Нажмите "Импорт" и кнопку подключения.</div>
+            </div>
+            <button class="close-modal" onclick="closeInstruction()">Понятно</button>
         </div>
     </div>
-
-    <!-- Кнопка поддержки (ссылка на тебя) -->
-    <button class="support-btn" onclick="openSupport()">
-        <i class="fas fa-headset"></i> Возникли вопросы? Поддержка
-    </button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. Имя юзера
+        // --- НАСТРОЙКИ (ПОМЕНЯЙ ССЫЛКУ!) ---
+        // Сюда вставь ссылку на оплату ИЛИ на свой личный профиль/бот техподдержки
+        // Например: 'https://t.me/Ajdaha61' или ссылка на YooMoney
+        const PAYMENT_URL = 'https://t.me/Ajdaha61?text=Здравствуйте! Хочу купить доступ к VPN'; 
+
+        // 1. User & Geo
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
         }
 
-        // 2. Гео и IP
         fetch('https://get.geojs.io/v1/ip/geo.json')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 document.getElementById('cityText').innerText = data.city || "Интернет";
                 document.getElementById('ipText').innerText = "IP: " + data.ip;
             })
             .catch(() => {
-                document.getElementById('cityText').innerText = "Россия";
+                document.getElementById('cityText').innerText = "Неизвестно";
             });
 
-        // 3. Логика кнопки "Купить" (Заглушка)
-        function buySubscription() {
+        // 2. Логика "Оплаты" без сервера
+        function startPaymentProcess() {
             const btn = document.getElementById('mainBtn');
-            const card = document.getElementById('statusCard');
-            const icon = document.getElementById('statusIcon');
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
-            
+            const originalContent = btn.innerHTML;
+
+            // Анимация загрузки
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Подготовка...';
+            btn.style.opacity = '0.8';
+
             setTimeout(() => {
-                card.classList.remove('danger');
-                card.style.borderColor = '#34C759';
-                icon.style.color = '#34C759';
-                icon.innerHTML = '<i class="fas fa-lock"></i>';
+                // Возвращаем кнопку и открываем ссылку
+                btn.innerHTML = originalContent;
+                btn.style.opacity = '1';
                 
-                document.querySelector('.status-text').innerText = "Доступ открыт!";
-                document.getElementById('ipText').style.display = 'none';
-                document.querySelector('.sub-text').innerText = "Ключ выслан ботом";
-                
-                document.getElementById('planInfo').style.display = 'flex';
-                
-                btn.innerHTML = 'ПРОДЛИТЬ ДОСТУП';
-                btn.style.background = '#2c2c2e';
-                
+                // Вибрация (приятно)
                 tg.HapticFeedback.notificationOccurred('success');
-            }, 1000);
+
+                // Открываем диалог для оплаты
+                tg.openTelegramLink(PAYMENT_URL);
+            }, 800);
         }
 
-        // 4. ФУНКЦИЯ ПОДДЕРЖКИ (Твой ник)
-        function openSupport() {
-            tg.openTelegramLink('https://t.me/Ajdaha61'); 
+        // 3. Инструкция
+        function openInstruction() {
+            document.getElementById('instructionModal').style.display = 'flex';
+            tg.BackButton.show();
+            tg.BackButton.onClick(closeInstruction);
         }
+        function closeInstruction() {
+            document.getElementById('instructionModal').style.display = 'none';
+            tg.BackButton.hide();
+        }
+
+        // 4. Поддержка
+        function openSupport() {
+            tg.openTelegramLink('https://t.me/Ajdaha61');
+        }
+
+        // 5. ❄️ Оптимизированный СНЕГ
+        (function() {
+            const canvas = document.getElementById('snow-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = window.innerWidth, h = window.innerHeight;
+            canvas.width = w; canvas.height = h;
+
+            const flakes = Array.from({length: 50}, () => ({
+                x: Math.random() * w, y: Math.random() * h,
+                r: Math.random() * 3 + 1, d: Math.random() * 50
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.beginPath();
+                flakes.forEach(f => {
+                    ctx.moveTo(f.x, f.y);
+                    ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+                });
+                ctx.fill();
+                update();
+                requestAnimationFrame(draw);
+            }
+
+            let angle = 0;
+            function update() {
+                angle += 0.01;
+                flakes.forEach((f, i) => {
+                    f.y += Math.cos(angle + f.d) + 1 + f.r/2;
+                    f.x += Math.sin(angle) * 2;
+                    if (f.y > h) { flakes[i] = {x: Math.random()*w, y: -10, r: f.r, d: f.d}; }
+                });
+            }
+            draw();
+            window.addEventListener('resize', () => { w=window.innerWidth; h=window.innerHeight; canvas.width=w; canvas.height=h; });
+        })();
     </script>
 </body>
 </html>
