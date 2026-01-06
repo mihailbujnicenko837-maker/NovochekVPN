@@ -15,7 +15,6 @@
             --text-sec: rgba(255, 255, 255, 0.5);
             --success: #32d74b;
             --danger: #ff453a;
-            --accent: #0A84FF;
         }
 
         body {
@@ -30,42 +29,22 @@
         }
 
         /* --- ❄️ СНЕГ --- */
-        #snow-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0;
-        }
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
-        /* --- 🎄 ГИРЛЯНДА (ИСПРАВЛЕНА) --- */
+        /* --- 🎄 ГИРЛЯНДА --- */
         .lightrope {
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            position: absolute;
-            z-index: 99; /* Поверх всего */
-            top: -15px;
-            left: 0;
-            width: 100%;
-            margin: 0; padding: 0;
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
+            text-align: center; white-space: nowrap; overflow: hidden;
+            position: absolute; z-index: 99; top: -15px; left: 0; width: 100%;
+            margin: 0; padding: 0; pointer-events: none; display: flex; justify-content: center;
         }
         .lightrope li {
-            position: relative;
-            list-style: none;
-            margin: 0 10px; /* Расстояние между лампами */
-            padding: 0;
-            display: block;
-            width: 12px; height: 12px;
-            border-radius: 50%;
-            background: rgba(255,255,255,1);
-            animation-fill-mode: both;
-            animation-iteration-count: infinite;
+            position: relative; list-style: none; margin: 0 10px; padding: 0;
+            display: block; width: 12px; height: 12px; border-radius: 50%;
+            background: rgba(255,255,255,1); animation-fill-mode: both; animation-iteration-count: infinite;
         }
         .lightrope li:before {
-            content: ""; position: absolute; background: #222;
-            width: 24px; height: 2px; border-radius: 50%;
-            top: -2px; left: -11px; z-index: -1;
+            content: ""; position: absolute; background: #222; width: 24px; height: 2px;
+            border-radius: 50%; top: -2px; left: -11px; z-index: -1;
         }
         .lightrope li:nth-child(2n+1) { background: #0f0; box-shadow: 0 2px 12px #0f0; animation: flash 2s infinite alternate; }
         .lightrope li:nth-child(4n+2) { background: #f00; box-shadow: 0 2px 12px #f00; animation: flash 2.5s infinite alternate; }
@@ -74,266 +53,105 @@
 
         /* --- КОНТЕЙНЕР --- */
         .container {
-            position: relative; z-index: 10;
-            padding: 20px; max-width: 480px; margin: 0 auto;
+            position: relative; z-index: 10; padding: 20px; max-width: 480px; margin: 0 auto;
             display: flex; flex-direction: column; gap: 20px;
         }
 
-        /* --- ШАПКА --- */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 30px; margin-bottom: 10px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 10px; }
         .user-info h1 { font-size: 22px; margin: 0; font-weight: 700; }
         .user-info p { margin: 4px 0 0 0; font-size: 13px; color: var(--text-sec); }
         .server-badge {
-            background: rgba(255,255,255,0.1); padding: 6px 12px;
-            border-radius: 20px; font-size: 12px; font-weight: 600;
-            display: flex; align-items: center; gap: 6px;
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(10px);
         }
 
-        /* --- ГЛАВНАЯ КАРТОЧКА (ДИНАМИЧЕСКАЯ) --- */
+        /* --- КАРТОЧКА --- */
         .status-card {
-            background: var(--card-glass);
-            border-radius: 24px;
-            padding: 25px;
-            border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px);
-            text-align: center;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+            background: var(--card-glass); border-radius: 24px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px);
+            text-align: center; transition: all 0.4s ease; position: relative; overflow: hidden;
         }
-        
-        /* Состояние: НЕ АКТИВЕН */
         .status-card.inactive { border-color: rgba(255, 69, 58, 0.3); }
         .status-card.inactive .icon-box { color: var(--danger); background: rgba(255, 69, 58, 0.1); }
         
-        /* Состояние: АКТИВЕН */
-        .status-card.active { border-color: rgba(50, 215, 75, 0.3); background: linear-gradient(180deg, rgba(50,215,75,0.05) 0%, rgba(255,255,255,0.02) 100%); }
-        .status-card.active .icon-box { color: var(--success); background: rgba(50, 215, 75, 0.1); }
-
         .icon-box {
-            width: 70px; height: 70px; border-radius: 50%;
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            font-size: 32px; transition: all 0.3s;
+            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 15px;
+            display: flex; align-items: center; justify-content: center; font-size: 32px;
         }
-        
         .status-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
         .status-desc { font-size: 14px; color: var(--text-sec); margin-bottom: 20px; }
 
-        /* Инфо-строка (осталось дней) */
-        .info-row {
-            display: flex; justify-content: space-between;
-            background: rgba(0,0,0,0.2); border-radius: 12px; padding: 12px 15px;
-            margin-top: 15px; display: none; /* Скрыто по умолчанию */
-        }
-        .status-card.active .info-row { display: flex; }
-        
-        .info-item { text-align: left; }
-        .info-label { font-size: 11px; color: var(--text-sec); display: block; }
-        .info-value { font-size: 14px; font-weight: 600; color: #fff; }
-
-        /* --- SPEED TEST WIDGET (ВИЗУАЛИЗАЦИЯ) --- */
-        .speed-widget {
-            display: none; /* Скрыто, пока не купил */
-            margin-top: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
-            padding: 15px;
-            align-items: center;
-            gap: 15px;
-        }
-        .status-card.active .speed-widget { display: flex; }
-        
-        .speed-graph {
-            flex: 1; height: 4px; background: #333; border-radius: 2px; overflow: hidden; position: relative;
-        }
-        .speed-bar {
-            width: 50%; height: 100%; background: var(--success);
-            position: absolute; left: 0; top: 0;
-            animation: speedAnim 2s infinite ease-in-out;
-            box-shadow: 0 0 10px var(--success);
-        }
-        @keyframes speedAnim { 0% { width: 30%; } 50% { width: 90%; } 100% { width: 40%; } }
-        
-        .speed-text { font-size: 12px; font-family: monospace; color: var(--success); min-width: 70px; text-align: right; }
-
-        /* --- КНОПКА ДЕЙСТВИЯ --- */
+        /* --- КНОПКА --- */
         .action-btn {
-            background: var(--primary);
-            color: white; border: none; width: 100%; padding: 18px;
-            border-radius: 16px; font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: transform 0.1s;
+            background: var(--primary); color: white; border: none; width: 100%; padding: 18px;
+            border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 10px;
             box-shadow: 0 4px 20px rgba(0, 122, 255, 0.25);
         }
         .action-btn:active { transform: scale(0.98); }
-        .action-btn.extend { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none; }
 
-        /* --- СЕТКА ПЛАТФОРМ --- */
+        /* --- ССЫЛКИ --- */
         .section-title { font-size: 13px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; margin: 10px 0 5px; }
-        
-        .platforms-grid {
-            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;
-        }
+        .platforms-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         .platform-card {
-            background: var(--card-glass);
-            border-radius: 12px; padding: 12px 5px;
+            background: var(--card-glass); border-radius: 12px; padding: 12px 5px;
             display: flex; flex-direction: column; align-items: center;
             border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
         }
         .platform-card i { font-size: 20px; margin-bottom: 6px; color: #fff; }
         .platform-card span { font-size: 10px; color: var(--text-sec); }
-        .platform-card:active { background: rgba(255,255,255,0.15); }
 
-        /* --- НИЖНЕЕ МЕНЮ --- */
-        .menu-list {
-            background: var(--card-glass); border-radius: 16px;
-            overflow: hidden;
-        }
+        /* --- МЕНЮ --- */
+        .menu-list { background: var(--card-glass); border-radius: 16px; overflow: hidden; }
         .menu-item {
             padding: 16px; display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
         }
         .menu-item:last-child { border-bottom: none; }
-        .menu-item:active { background: rgba(255,255,255,0.05); }
         .menu-icon { width: 30px; display: flex; justify-content: center; color: var(--text-sec); }
         .menu-text { flex: 1; font-size: 14px; margin-left: 10px; }
-        .menu-arrow { color: var(--text-sec); font-size: 12px; }
-
-        /* --- МОДАЛКА ОПЛАТЫ --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 200;
-            display: none; justify-content: center; align-items: center;
-            padding: 20px; backdrop-filter: blur(10px);
-        }
-        .modal {
-            background: #151517; width: 100%; max-width: 320px;
-            border-radius: 24px; padding: 25px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .loader {
-            border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary);
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin: 0 auto 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .modal h3 { margin: 0 0 10px; font-size: 18px; }
-        .modal p { font-size: 13px; color: var(--text-sec); margin: 0 0 20px; line-height: 1.5; }
-        
-        .btn-check {
-            background: var(--success); color: #000; border: none;
-            width: 100%; padding: 14px; border-radius: 12px;
-            font-weight: 700; cursor: pointer; margin-bottom: 10px;
-        }
-        .btn-cancel { background: transparent; color: var(--text-sec); border: none; font-size: 13px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- ❄️ ФОН -->
     <canvas id="snow-canvas"></canvas>
-    
-    <!-- 🎄 ГИРЛЯНДА -->
-    <ul class="lightrope">
-        <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
-    </ul>
+    <ul class="lightrope"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>
 
     <div class="container">
-        
-        <!-- HEADER -->
         <div class="header">
             <div class="user-info">
                 <h1 id="userName">Гость</h1>
                 <p id="userCity">Определение локации...</p>
             </div>
-            <div class="server-badge" id="pingBadge">
-                <div style="width:6px; height:6px; background:#ff453a; border-radius:50%;" id="pingDot"></div>
-                <span id="pingText">Offline</span>
+            <div class="server-badge">
+                <div style="width:6px; height:6px; background:#ff453a; border-radius:50%; margin-right:5px;"></div>
+                <span>Server: Europe</span>
             </div>
         </div>
 
-        <!-- MAIN CARD -->
         <div class="status-card inactive" id="mainCard">
-            <div class="icon-box" id="statusIcon">
-                <i class="fas fa-lock"></i>
-            </div>
-            <div class="status-title" id="statusTitle">Защита отключена</div>
-            <div class="status-desc" id="statusDesc">Ваш трафик не зашифрован</div>
-            
-            <!-- Блок подписки (Скрыт если нет оплаты) -->
-            <div class="info-row">
-                <div class="info-item">
-                    <span class="info-label">Тариф</span>
-                    <span class="info-value">Premium 🎄</span>
-                </div>
-                <div class="info-item" style="text-align: right;">
-                    <span class="info-label">Истекает</span>
-                    <span class="info-value" id="expDate">--.--.--</span>
-                </div>
-            </div>
-
-            <!-- Визуализация скорости (Скрыто если нет оплаты) -->
-            <div class="speed-widget">
-                <i class="fas fa-bolt" style="color: var(--success); font-size: 14px;"></i>
-                <div class="speed-graph"><div class="speed-bar"></div></div>
-                <div class="speed-text" id="speedNum">0 Mbps</div>
-            </div>
+            <div class="icon-box"><i class="fas fa-lock"></i></div>
+            <div class="status-title">Защита отключена</div>
+            <div class="status-desc">Купите подписку для доступа</div>
         </div>
 
-        <!-- ACTION BUTTON -->
-        <button class="action-btn" id="mainBtn" onclick="handleMainButton()">
-            <i class="fas fa-shield-alt"></i> КУПИТЬ ДОСТУП
+        <button class="action-btn" id="mainBtn" onclick="buySubscription()">
+            <i class="fas fa-shield-alt"></i> КУПИТЬ ЗА 129₽
         </button>
 
-        <!-- DOWNLOADS -->
-        <div class="section-title">Установить приложение</div>
+        <div class="section-title">Скачать приложение</div>
         <div class="platforms-grid">
-            <div class="platform-card" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')">
-                <i class="fab fa-apple"></i> <span>iOS</span>
-            </div>
-            <div class="platform-card" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android')">
-                <i class="fab fa-android"></i> <span>Android</span>
-            </div>
-            <div class="platform-card" onclick="tg.openLink('https://github.com/hiddify/hiddify-next/releases/latest')">
-                <i class="fab fa-windows"></i> <span>PC</span>
-            </div>
-            <div class="platform-card" onclick="alert('Для TV скачайте V2RayTun из Google Play на телевизоре')">
-                <i class="fas fa-tv"></i> <span>TV</span>
-            </div>
+            <div class="platform-card" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')"><i class="fab fa-apple"></i><span>iOS</span></div>
+            <div class="platform-card" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android')"><i class="fab fa-android"></i><span>Android</span></div>
+            <div class="platform-card" onclick="tg.openLink('https://github.com/hiddify/hiddify-next/releases')"><i class="fab fa-windows"></i><span>PC</span></div>
+            <div class="platform-card" onclick="tg.showAlert('Для ТВ ищите V2RayTun в магазине приложений')"><i class="fas fa-tv"></i><span>TV</span></div>
         </div>
 
-        <!-- MENU -->
         <div class="menu-list">
-            <div class="menu-item" onclick="openHelp()">
-                <div class="menu-icon"><i class="fas fa-book-open"></i></div>
-                <div class="menu-text">Инструкция подключения</div>
-                <i class="fas fa-chevron-right menu-arrow"></i>
-            </div>
             <div class="menu-item" onclick="tg.openTelegramLink('https://t.me/Ajdaha61')">
                 <div class="menu-icon"><i class="fas fa-headset"></i></div>
-                <div class="menu-text">Поддержка 24/7</div>
-                <i class="fas fa-chevron-right menu-arrow"></i>
+                <div class="menu-text">Поддержка</div>
             </div>
-            <div class="menu-item" onclick="resetDemo()">
-                <div class="menu-icon"><i class="fas fa-redo"></i></div>
-                <div class="menu-text" style="color: var(--text-sec)">Сбросить демо (для теста)</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MOCK PAYMENT MODAL -->
-    <div class="modal-overlay" id="paymentModal">
-        <div class="modal">
-            <div class="loader"></div>
-            <h3>Ожидание оплаты</h3>
-            <p>Мы открыли диалог с администратором. Произведите оплату и нажмите кнопку ниже.</p>
-            <button class="btn-check" onclick="confirmPaymentMock()">Я оплатил!</button>
-            <button class="btn-cancel" onclick="closePaymentModal()">Отмена</button>
         </div>
     </div>
 
@@ -341,166 +159,50 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // КОНФИГ
-        const ADMIN_LINK = 'https://t.me/Ajdaha61?text=Хочу купить VPN Premium';
-        
-        // 1. Инициализация пользователя
+        // Имя
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
         }
 
-        // 2. Гео и IP
+        // Гео
         fetch('https://get.geojs.io/v1/ip/geo.json')
             .then(res => res.json())
-            .then(data => {
-                document.getElementById('userCity').innerText = `${data.city}, ${data.country}`;
-            })
-            .catch(() => { document.getElementById('userCity').innerText = 'Земля'; });
+            .then(data => { document.getElementById('userCity').innerText = data.city || 'Планета Земля'; })
+            .catch(() => {});
 
-        // 3. ПРОВЕРКА ПОДПИСКИ (Имитация Бэкенда через LocalStorage)
-        function checkSubscription() {
-            const expiry = localStorage.getItem('vpn_expiry');
-            const now = new Date();
-            
-            if (expiry && new Date(expiry) > now) {
-                // ПОДПИСКА АКТИВНА
-                setAppActive(new Date(expiry));
-            } else {
-                // ПОДПИСКА НЕ АКТИВНА
-                setAppInactive();
-            }
-        }
-
-        function setAppActive(dateObj) {
-            const card = document.getElementById('mainCard');
+        // --- ГЛАВНАЯ ФУНКЦИЯ: ОТПРАВКА БОТУ ---
+        function buySubscription() {
             const btn = document.getElementById('mainBtn');
-            const pingDot = document.getElementById('pingDot');
-            const pingText = document.getElementById('pingText');
+            const originalText = btn.innerHTML;
             
-            // UI
-            card.classList.remove('inactive');
-            card.classList.add('active');
-            
-            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-rocket"></i>';
-            document.getElementById('statusTitle').innerText = "VPN Активен";
-            document.getElementById('statusDesc').innerText = "Трафик зашифрован. Скорость макс.";
-            
-            // Дата
-            const day = dateObj.getDate().toString().padStart(2, '0');
-            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-            document.getElementById('expDate').innerText = `${day}.${month}.2026`; // Год фейк для примера
+            // Анимация
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Секунду...';
+            btn.style.opacity = '0.8';
 
-            // Кнопка
-            btn.innerHTML = '<i class="fas fa-sync"></i> ПРОДЛИТЬ (29 ДН.)';
-            btn.classList.add('extend');
-            btn.onclick = () => tg.openTelegramLink(ADMIN_LINK); // Продление ведет к админу
-
-            // Пинг (Фейк)
-            pingDot.style.background = '#32d74b';
-            pingText.innerText = '45 ms';
-            
-            // Запуск симуляции скорости
-            startSpeedSimulation();
-        }
-
-        function setAppInactive() {
-            const card = document.getElementById('mainCard');
-            const btn = document.getElementById('mainBtn');
-            const pingDot = document.getElementById('pingDot');
-            const pingText = document.getElementById('pingText');
-
-            card.classList.remove('active');
-            card.classList.add('inactive');
-            
-            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-lock"></i>';
-            document.getElementById('statusTitle').innerText = "Вы не защищены";
-            document.getElementById('statusDesc').innerText = "Купите доступ для защиты данных";
-            
-            btn.innerHTML = '<i class="fas fa-shield-alt"></i> КУПИТЬ ДОСТУП';
-            btn.classList.remove('extend');
-            btn.onclick = handleMainButton;
-
-            pingDot.style.background = '#ff453a';
-            pingText.innerText = 'Offline';
-        }
-
-        // 4. ЛОГИКА ОПЛАТЫ (Сценарий)
-        function handleMainButton() {
-            // Открываем модалку ожидания
-            document.getElementById('paymentModal').style.display = 'flex';
-            
-            // Открываем чат с админом для оплаты
-            tg.openTelegramLink(ADMIN_LINK);
-        }
-
-        function confirmPaymentMock() {
-            // Имитируем, что сервер проверил оплату
-            const btn = document.querySelector('.btn-check');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Проверка...';
-            
             setTimeout(() => {
-                // Сохраняем "покупку" на 30 дней
-                const date = new Date();
-                date.setDate(date.getDate() + 30);
-                localStorage.setItem('vpn_expiry', date.toISOString());
+                // Отправляем сигнал боту
+                const data = {
+                    action: "buy_subscription", 
+                    price: 129
+                };
+                tg.sendData(JSON.stringify(data));
                 
-                // Закрываем модалку и обновляем UI
-                document.getElementById('paymentModal').style.display = 'none';
-                tg.HapticFeedback.notificationOccurred('success');
-                checkSubscription();
-                
-                btn.innerHTML = 'Я оплатил!'; // Вернуть текст
-            }, 1500);
+                // (Приложение закроется после этой команды)
+            }, 500);
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').style.display = 'none';
-        }
-
-        // Для тестов: сброс
-        function resetDemo() {
-            if(confirm('Сбросить статус подписки?')) {
-                localStorage.removeItem('vpn_expiry');
-                window.location.reload();
-            }
-        }
-
-        function openHelp() {
-            tg.showAlert("Инструкция:\n1. Оплатите доступ.\n2. Скопируйте ключ (vless://).\n3. Вставьте в приложение V2RayTun.\n4. Нажмите кнопку подключения!");
-        }
-
-        // 5. СИМУЛЯТОР СКОРОСТИ
-        function startSpeedSimulation() {
-            const el = document.getElementById('speedNum');
-            setInterval(() => {
-                // Случайное число от 150 до 300 Mbps
-                const speed = Math.floor(Math.random() * (300 - 150 + 1) + 150);
-                el.innerText = speed + " Mbps";
-            }, 1000);
-        }
-
-        // 6. СНЕГ (Оптимизированный)
+        // Снег
         (function() {
             const c = document.getElementById('snow-canvas'), ctx = c.getContext('2d');
             let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
-            const flakes = Array.from({length: 40}, () => ({
-                x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+1, s: Math.random()*2+1
-            }));
+            const flakes = Array.from({length: 40}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+1, s: Math.random()*2+1}));
             function loop() {
-                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.beginPath();
-                flakes.forEach(f => {
-                    f.y += f.s; f.x += Math.sin(f.y/50)*0.5;
-                    if(f.y>h) f.y = -5;
-                    ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
-                });
+                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.beginPath();
+                flakes.forEach(f => { f.y += f.s; f.x += Math.sin(f.y/50)*0.5; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
                 ctx.fill(); requestAnimationFrame(loop);
             }
             loop();
         })();
-
-        // Запуск при старте
-        checkSubscription();
-
     </script>
 </body>
 </html>
