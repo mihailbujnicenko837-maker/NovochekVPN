@@ -104,4 +104,209 @@ body::after{
   background:rgba(255,255,255,.1);
   display:flex;align-items:center;gap:6px
 }
-.dot{width:8px;height:8px;border-radius:50%;background:var(--
+.dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}
+.dot.active{background:var(--success)}
+
+/* ===== MAIN CARD ===== */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+  border:1px solid var(--border);
+  border-radius:30px;
+  padding:36px 20px;
+  text-align:center;
+  margin-bottom:20px
+}
+.shield{
+  width:140px;height:140px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  background:rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border)
+}
+.shield i{font-size:58px;color:var(--muted)}
+.card.active i{color:var(--success)}
+
+/* ===== INFO ===== */
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.box{
+  background:rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:14px;
+  border:1px solid var(--border)
+}
+.box span{display:block}
+.label{font-size:11px;color:var(--muted)}
+.value{font-size:15px;font-weight:600}
+
+/* ===== BUTTON ===== */
+.btn{
+  background:var(--primary);
+  border:none;
+  width:100%;
+  padding:18px;
+  border-radius:20px;
+  color:#fff;
+  font-weight:700;
+}
+.btn:active{transform:scale(.97)}
+
+/* ===== SECTIONS ===== */
+.section{display:none}
+.section.active{display:block}
+
+/* ===== GUIDE ===== */
+.guide-step{
+  display:flex;gap:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px
+}
+.gs{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:var(--primary);
+  color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800
+}
+.guide-step h4{margin:0 0 6px;font-size:15px}
+.guide-step p{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
+
+/* ===== NAV ===== */
+.nav{
+  position:fixed;
+  bottom:0;left:0;
+  width:100%;height:var(--nav-h);
+  background:rgba(20,20,23,.85);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center
+}
+.nav button{
+  background:none;border:none;
+  color:var(--muted);
+  font-size:11px
+}
+.nav button.active{color:var(--primary)}
+</style>
+</head>
+
+<body>
+
+<!-- LAUNCH -->
+<div id="launch">
+  <div>
+    <h1>Novochek <span>VPN</span></h1>
+    <div class="loader"></div>
+  </div>
+</div>
+
+<div class="grain"></div>
+<canvas id="snow-canvas"></canvas>
+
+<div class="app">
+  <div class="scroll">
+
+    <div class="header">
+      <div class="user-info">
+        <h2 id="userName">Привет!</h2>
+        <p>Novochek VPN</p>
+      </div>
+      <div class="status">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">Disconnected</span>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="home" class="section active">
+      <div class="card" id="mainCard">
+        <div class="shield"><i class="fas fa-shield-alt"></i></div>
+        <h3 id="title">Вы не защищены</h3>
+        <p style="color:var(--muted)" id="desc">Подключите VPN для защиты</p>
+      </div>
+
+      <div class="info">
+        <div class="box">
+          <span class="label">IP адрес</span>
+          <span class="value" id="ip">...</span>
+        </div>
+        <div class="box">
+          <span class="label">Локация</span>
+          <span class="value" id="loc">...</span>
+        </div>
+      </div>
+
+      <button class="btn" onclick="buy()">ПОЛУЧИТЬ ДОСТУП</button>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="profile" class="section">
+      <div class="card">
+        <h3>Мой аккаунт</h3>
+        <p style="color:var(--muted)">Telegram ID, подписка и сервер</p>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="guide" class="section">
+      <h3 style="margin-bottom:18px">Как подключиться</h3>
+
+      <div class="guide-step"><div class="gs">1</div><div><h4>Установите приложение</h4><p>V2Box (iOS) или Hiddify (Android)</p></div></div>
+      <div class="guide-step"><div class="gs">2</div><div><h4>Купите подписку</h4><p>Бот выдаст ключ формата vless://</p></div></div>
+      <div class="guide-step"><div class="gs">3</div><div><h4>Импортируйте ключ</h4><p>Добавьте ключ в приложение</p></div></div>
+      <div class="guide-step"><div class="gs">4</div><div><h4>Нажмите Старт</h4><p>Интернет станет защищённым</p></div></div>
+    </div>
+
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="tab('home',this)">Главная</button>
+    <button onclick="tab('profile',this)">Профиль</button>
+    <button onclick="tab('guide',this)">Гайд</button>
+  </div>
+</div>
+
+<script>
+const tg=window.Telegram.WebApp;
+tg.expand();
+
+if(tg.initDataUnsafe.user){
+  userName.textContent="Привет, "+tg.initDataUnsafe.user.first_name+"!";
+}
+
+fetch("https://ipapi.co/json/")
+.then(r=>r.json())
+.then(d=>{
+  ip.textContent=d.ip;
+  loc.textContent=d.city;
+});
+
+function tab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function buy(){
+  tg.sendData(JSON.stringify({action:"buy"}));
+}
+
+/* SNOW */
+(()=>{const c=snow-canvas,ctx=c.getContext("2d");
+let w=c.width=innerWidth,h=c.height=innerHeight;
+const f=[...Array(30)].map(()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+1,s:Math.random()+.5}));
+(function loop(){
+ctx.clearRect(0,0,w,h);
+ctx.fillStyle="rgba(255,255,255,.4)";
+ctx.beginPath();
+f.forEach(e=>{e.y+=e.s;e.x+=Math.sin(e.y/50)*.5;if(e.y>h)e.y=-5;ctx.moveTo(e.x,e.y);ctx.arc(e.x,e.y,e.r,0,7)});
+ctx.fill();requestAnimationFrame(loop);
+})();})();
+</script>
+</body>
+</html>
