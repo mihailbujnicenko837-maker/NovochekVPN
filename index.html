@@ -2,16 +2,19 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Novochek VPN</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
 :root {
   --bg: #0b0b0d;
   --glass: rgba(20,20,25,0.6);
+  --glass-active: rgba(20, 30, 25, 0.7);
   --border: rgba(255,255,255,0.08);
   --primary: #2cabff;
+  --success: #32d74b;
   --text: #fff;
   --muted: #8e8e93;
 }
@@ -27,11 +30,12 @@ body {
   overflow:hidden;
 }
 
-/* ===== BACKGROUND IMAGE (BLACK & WHITE) ===== */
+/* ===== BACKGROUND IMAGE ===== */
 body::before {
   content:"";
   position:fixed;
   inset:0;
+  /* Убедись, что картинка лежит рядом с файлом index.html */
   background:url("bg.jpg.jpg") center/cover no-repeat;
   filter: grayscale(100%) blur(8px) contrast(1.1);
   opacity:0.28;
@@ -102,9 +106,10 @@ body::after {
   border-radius:26px;
   padding:24px;
   box-shadow:0 20px 50px rgba(0,0,0,.4);
+  transition: 0.3s;
 }
 
-/* ===== SECTIONS (LIQUID TRANSITION) ===== */
+/* ===== SECTIONS TRANSITION ===== */
 .sections {
   flex:1;
   position:relative;
@@ -135,9 +140,43 @@ body::after {
   width:100%;
   border-radius:18px;
   font-weight:700;
+  font-size: 16px;
   box-shadow:0 12px 30px rgba(44,171,255,.35);
+  margin-top: 20px;
+  cursor: pointer;
 }
 .btn:active {transform:scale(.96);}
+
+/* ===== KEY BOX (Новое) ===== */
+.key-container {
+    margin-top: 15px;
+    background: rgba(0,0,0,0.3);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 15px;
+    display: none; /* Скрыто по умолчанию */
+}
+.key-container.show { display: block; }
+.key-text {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--primary);
+    word-break: break-all;
+    max-height: 50px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+.copy-btn {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
 
 /* ===== NAV ===== */
 .nav {
@@ -148,14 +187,25 @@ body::after {
   background:rgba(15,15,18,.75);
   backdrop-filter:blur(25px);
   border-top:1px solid var(--border);
+  position: relative;
+  z-index: 50;
 }
 .nav button {
   background:none;
   border:none;
   color:var(--muted);
   font-size:12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
+.nav button i { font-size: 20px; margin-bottom: 2px; }
 .nav button.active {color:var(--primary);}
+
+/* Helper classes */
+.text-success { color: var(--success) !important; }
+.text-danger { color: var(--danger) !important; }
 </style>
 </head>
 
@@ -170,51 +220,40 @@ body::after {
   <div class="sections">
 
     <div class="section active" id="home">
-      <div class="card">
-        <h2>Вы не защищены</h2>
-        <p style="color:var(--muted)">Подключите VPN для защиты трафика</p>
-        <button class="btn">Получить доступ</button>
+      <div class="card" id="mainCard">
+        <h2 id="statusTitle">Вы не защищены</h2>
+        <p style="color:var(--muted)" id="statusDesc">Подключите VPN для защиты</p>
+        
+        <div class="key-container" id="keyBlock">
+            <div class="key-text" id="keyString">...</div>
+            <button class="copy-btn" onclick="copyKey()">Скопировать ключ</button>
+        </div>
+
+        <button class="btn" id="mainBtn" onclick="handleAction()">Получить доступ</button>
       </div>
     </div>
 
     <div class="section" id="profile">
       <div class="card">
         <h2>Профиль</h2>
-        <p style="color:var(--muted)">Telegram ID • Подписка • Сервер</p>
+        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <span style="color:var(--muted)">Имя</span>
+                <span id="profileName">...</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <span style="color:var(--muted)">ID</span>
+                <span id="profileId">...</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--muted)">Истекает</span>
+                <span id="profileExp">Нет подписки</span>
+            </div>
+        </div>
       </div>
     </div>
 
     <div class="section" id="guide">
       <div class="card">
         <h2>Инструкция</h2>
-        <p style="color:var(--muted)">
-          1. Установи приложение<br>
-          2. Импортируй ключ<br>
-          3. Нажми старт
-        </p>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="nav">
-    <button class="active" onclick="tab('home',this)">Главная</button>
-    <button onclick="tab('profile',this)">Профиль</button>
-    <button onclick="tab('guide',this)">Гайд</button>
-  </div>
-</div>
-
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-function tab(id,btn){
-  tg.HapticFeedback.selectionChanged();
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-</script>
-</body>
-</html>
+        <div style="display
