@@ -1,143 +1,297 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Novochek VPN</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            /* Цвета под стиль аватарки (Хром + Тьма) */
-            --bg-color: #050505;
-            --card-bg: rgba(30, 30, 35, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            
-            /* Градиент хрома для текста */
-            --chrome-text: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
-            
-            --primary: #2cabff; /* Акцент (как на кнопках) */
-            --success: #32d74b;
-            --danger: #ff453a;
-            --text-main: #e0e0e0;
-            --text-sec: #8e8e93;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Novochek VPN</title>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000000 70%);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-        /* --- 🎬 СПЛЭШ-ЭКРАН (ЗАГРУЗКА) --- */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease-out;
-        }
-        
-        .splash-icon {
-            font-size: 60px; color: #fff;
-            background: linear-gradient(135deg, #fff 0%, #777 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            animation: pulseShield 2s infinite;
-        }
+<style>
+:root{
+  --bg:#0f0f11;
+  --glass:rgba(30,30,35,.7);
+  --border:rgba(255,255,255,.08);
+  --primary:#2cabff;
+  --success:#32d74b;
+  --danger:#ff453a;
+  --text:#fff;
+  --muted:#8e8e93;
+  --nav-h:80px;
+}
 
-        .splash-title {
-            font-size: 32px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 20%, #666 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 10px rgba(255,255,255,0.1);
-            opacity: 0; transform: scale(0.9);
-            animation: logoIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-        
-        .splash-bar-container {
-            width: 120px; height: 3px; background: #222; border-radius: 2px; margin-top: 20px; overflow: hidden;
-            opacity: 0; animation: fadeIn 0.5s 0.5s forwards;
-        }
-        .splash-bar {
-            width: 100%; height: 100%; background: #fff;
-            transform: translateX(-100%);
-            animation: loadBar 1.5s 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Roboto;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
+}
 
-        @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes loadBar { to { transform: translateX(0); } }
-        @keyframes pulseShield { 0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,255,255,0)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); } 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,255,255,0)); } }
+/* ===== BACKGROUND (soft, black & white) ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("bg.jpg.jpg") center/cover no-repeat;
+  filter:grayscale(100%) blur(6px) contrast(1.05);
+  opacity:.25;
+  z-index:-2;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,rgba(0,0,0,.35),rgba(0,0,0,.9));
+  z-index:-1;
+}
 
+/* ===== FILM GRAIN ===== */
+.grain{
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity:.12;
+  z-index:5;
+}
 
-        /* --- КОНТЕЙНЕР --- */
-        .app-container {
-            padding: 20px; padding-bottom: 50px; max-width: 500px; margin: 0 auto;
-            position: relative; z-index: 10; opacity: 0; transition: opacity 1s;
-        }
+/* ===== LAUNCH SCREEN ===== */
+#launch{
+  position:fixed;
+  inset:0;
+  background:#0b0b0d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  animation:launchOut .8s ease forwards;
+  animation-delay:2.2s;
+}
+#launch h1{
+  margin:0 0 18px;
+  font-size:30px;
+  font-weight:800;
+}
+#launch span{color:#9aa0a6}
+.loader{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#9aa0a6;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes launchOut{to{opacity:0;pointer-events:none}}
 
-        /* --- ХЕДЕР --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
-        .user-welcome h2 { 
-            margin: 0; font-size: 24px; font-weight: 800; 
-            background: linear-gradient(90deg, #fff, #b0b0b0); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-        }
-        .user-welcome p { margin: 4px 0 0; font-size: 13px; color: var(--text-sec); }
-        
-        /* --- ВКЛАДКИ (ВЕРХУ) --- */
-        .tabs { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 16px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
-        .tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sec); border-radius: 12px; transition: 0.3s; cursor: pointer; }
-        .tab.active { background: rgba(255,255,255,0.1); color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+/* ===== LAYOUT ===== */
+.app{height:100%;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;padding:20px;padding-bottom:110px}
 
-        .content-section { display: none; animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .content-section.active { display: block; }
+/* ===== HEADER ===== */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.user-info h2{margin:0;font-size:26px;font-weight:800}
+.user-info p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.status{
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:20px;
+  background:rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:6px
+}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}
+.dot.active{background:var(--success)}
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+/* ===== MAIN CARD ===== */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+  border:1px solid var(--border);
+  border-radius:30px;
+  padding:36px 20px;
+  text-align:center;
+  margin-bottom:20px
+}
+.shield{
+  width:140px;height:140px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  background:rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border)
+}
+.shield i{font-size:58px;color:var(--muted)}
+.card.active i{color:var(--success)}
 
-        /* --- КАРТОЧКА СТАТУСА --- */
-        .main-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px; padding: 35px 20px;
-            text-align: center; margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            position: relative; overflow: hidden;
-        }
-        
-        /* Металлический блик на карточке */
-        .main-card::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-20deg);
-            animation: shineCard 6s infinite; pointer-events: none;
-        }
-        @keyframes shineCard { 0%, 50% { left: -100%; } 100% { left: 200%; } }
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.box{
+  background:rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:14px;
+  border:1px solid var(--border)
+}
+.label{font-size:11px;color:var(--muted)}
+.value{font-size:15px;font-weight:600}
 
-        .status-ring {
-            width: 120px; height: 120px; margin: 0 auto 20px;
-            border-radius: 50%; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.4);
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
-        }
-        
-        .pulse-border {
-            position: absolute; inset: -3px; border-radius: 50%;
-            border: 2px solid transparent; opacity: 0;
-        }
-        
-        /* Цвета статусов */
-        .active-sub .pulse-border { border-color: var(--success); animation: spinPulse 3s infinite linear; }
-        .active-sub .status-icon { color: var(--success); filter: drop-shadow(0 0 15px rgba(50,215,75,0.4)); }
-        
-        .inactive-sub .pulse-border { border-color: var(--danger); }
-        .inactive-sub .status-icon { color: var(--danger); filter: drop-shadow(0 0 15px rgba(255, 69, 58, 0.4)); }
+.btn{
+  background:var(--primary);
+  border:none;
+  width:100%;
+  padding:18px;
+  border-radius:20px;
+  color:#fff;
+  font-weight:700;
+}
+.btn:active{transform:scale(.97)}
 
-        .status-icon { font-size:
+.section{display:none}
+.section.active{display:block}
+
+/* ===== GUIDE ===== */
+.guide-step{
+  display:flex;gap:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px
+}
+.gs{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:var(--primary);
+  color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800
+}
+.guide-step h4{margin:0 0 6px;font-size:15px}
+.guide-step p{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
+
+/* ===== NAV ===== */
+.nav{
+  position:fixed;
+  bottom:0;left:0;
+  width:100%;height:var(--nav-h);
+  background:rgba(20,20,23,.85);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center
+}
+.nav button{
+  background:none;border:none;
+  color:var(--muted);
+  font-size:11px
+}
+.nav button.active{color:var(--primary)}
+</style>
+</head>
+
+<body>
+
+<div id="launch">
+  <div>
+    <h1>Novochek <span>VPN</span></h1>
+    <div class="loader"></div>
+  </div>
+</div>
+
+<div class="grain"></div>
+<canvas id="snow-canvas"></canvas>
+
+<div class="app">
+  <div class="scroll">
+
+    <div class="header">
+      <div class="user-info">
+        <h2 id="userName">Привет!</h2>
+        <p>Novochek VPN</p>
+      </div>
+      <div class="status">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">Disconnected</span>
+      </div>
+    </div>
+
+    <div id="home" class="section active">
+      <div class="card">
+        <div class="shield"><i class="fas fa-shield-alt"></i></div>
+        <h3>Вы не защищены</h3>
+        <p style="color:var(--muted)">Нажмите кнопку ниже, чтобы получить доступ</p>
+      </div>
+
+      <div class="info">
+        <div class="box">
+          <span class="label">Ваш IP адрес</span>
+          <span class="value" id="ip">Скрыт</span>
+        </div>
+        <div class="box">
+          <span class="label">Локация</span>
+          <span class="value" id="loc">—</span>
+        </div>
+      </div>
+
+      <button class="btn" onclick="buy()">⚡ ПОЛУЧИТЬ ДОСТУП</button>
+    </div>
+
+    <div id="profile" class="section">
+      <div class="card">
+        <h3>Мой аккаунт</h3>
+        <p style="color:var(--muted)">Telegram ID и подписка</p>
+      </div>
+    </div>
+
+    <div id="guide" class="section">
+      <h3 style="margin-bottom:18px">Как подключиться</h3>
+
+      <div class="guide-step"><div class="gs">1</div><div><h4>Установите приложение</h4><p>V2Box (iOS) или Hiddify (Android)</p></div></div>
+      <div class="guide-step"><div class="gs">2</div><div><h4>Купите подписку</h4><p>Бот выдаст ключ формата vless://</p></div></div>
+      <div class="guide-step"><div class="gs">3</div><div><h4>Импортируйте ключ</h4><p>Добавьте ключ в приложение</p></div></div>
+      <div class="guide-step"><div class="gs">4</div><div><h4>Нажмите «Старт»</h4><p>Интернет станет защищённым</p></div></div>
+    </div>
+
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="tab('home',this)">Главная</button>
+    <button onclick="tab('profile',this)">Профиль</button>
+    <button onclick="tab('guide',this)">Гайд</button>
+  </div>
+</div>
+
+<script>
+const tg=window.Telegram.WebApp;
+tg.expand();
+
+if(tg.initDataUnsafe.user){
+  userName.textContent="Привет, "+tg.initDataUnsafe.user.first_name+"!";
+}
+
+function tab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function buy(){
+  tg.sendData(JSON.stringify({action:"buy_subscription"}));
+}
+
+/* SNOW */
+(()=>{const c=document.getElementById("snow-canvas"),ctx=c.getContext("2d");
+let w=c.width=innerWidth,h=c.height=innerHeight;
+const f=[...Array(30)].map(()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+1,s:Math.random()+.5}));
+(function loop(){
+ctx.clearRect(0,0,w,h);
+ctx.fillStyle="rgba(255,255,255,.4)";
+ctx.beginPath();
+f.forEach(e=>{e.y+=e.s;e.x+=Math.sin(e.y/50)*.5;if(e.y>h)e.y=-5;ctx.moveTo(e.x,e.y);ctx.arc(e.x,e.y,e.r,0,7)});
+ctx.fill();requestAnimationFrame(loop);
+})();})();
+</script>
+
+</body>
+</html>
