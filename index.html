@@ -1,368 +1,107 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Novochek VPN</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            /* Цвета под твою аватарку (Сталь + Неон) */
-            --bg-color: #050507;
-            --card-bg: rgba(20, 20, 25, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --primary: #3b82f6; /* Синий неон */
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --success: #10b981;
-            --danger: #ef4444;
-            --text-main: #ffffff;
-            --text-sec: #9ca3af;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Novochek VPN</title>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-        /* --- 🎬 СПЛЭШ-ЭКРАН (ЗАГРУЗКА) --- */
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease-out;
-        }
-        .splash-logo {
-            font-size: 40px; font-weight: 800; letter-spacing: -1px;
-            background: linear-gradient(135deg, #fff 0%, #3b82f6 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: 0; transform: scale(0.8);
-            animation: logoEnter 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-        .splash-sub {
-            margin-top: 10px; font-size: 14px; color: var(--text-sec); letter-spacing: 2px; text-transform: uppercase;
-            opacity: 0; animation: fadeUp 1s 0.5s forwards;
-        }
-        .splash-loader {
-            width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 30px;
-            overflow: hidden; opacity: 0; animation: fadeUp 1s 0.8s forwards;
-        }
-        .splash-bar {
-            width: 100%; height: 100%; background: var(--primary);
-            transform: translateX(-100%);
-            animation: loadBar 1.5s 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+<style>
+:root{
+  --bg:#0f0f11;
+  --glass:rgba(30,30,35,.7);
+  --border:rgba(255,255,255,.08);
+  --primary:#2cabff;
+  --success:#32d74b;
+  --danger:#ff453a;
+  --text:#fff;
+  --muted:#8e8e93;
+  --nav-h:80px;
+}
 
-        @keyframes logoEnter { to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes loadBar { to { transform: translateX(0); } }
+/* ===== BASE ===== */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Roboto;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
+}
 
-        /* --- ФОН --- */
-        .orb {
-            position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.4;
-            animation: float 10s infinite ease-in-out;
-        }
-        .orb-1 { top: -20%; left: -20%; width: 400px; height: 400px; background: var(--primary); }
-        .orb-2 { bottom: -20%; right: -20%; width: 300px; height: 300px; background: #6366f1; animation-delay: -5s; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, 40px); } }
+/* ===== BACKGROUND IMAGE (soft B/W) ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("bg.jpg.jpg") center/cover no-repeat;
+  filter:grayscale(100%) blur(6px) contrast(1.05);
+  opacity:.25;
+  z-index:-2;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,rgba(0,0,0,.3),rgba(0,0,0,.9));
+  z-index:-1;
+}
 
-        .app-container {
-            padding: 20px; padding-bottom: 50px; max-width: 500px; margin: 0 auto;
-            position: relative; z-index: 10; opacity: 0; transition: opacity 1s;
-        }
+/* ===== FILM GRAIN ===== */
+.grain{
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity:.12;
+  z-index:5;
+}
 
-        /* --- HEADER --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
-        .user-welcome h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-        .user-welcome p { margin: 2px 0 0; font-size: 13px; color: var(--text-sec); }
-        
-        /* --- TABS --- */
-        .tabs { 
-            display: flex; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 16px; margin-bottom: 25px; 
-            border: 1px solid var(--glass-border);
-        }
-        .tab { 
-            flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sec); 
-            border-radius: 12px; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden;
-        }
-        .tab.active { background: rgba(255,255,255,0.08); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+/* ===== LAUNCH SCREEN ===== */
+#launch{
+  position:fixed;
+  inset:0;
+  background:#0b0b0d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  animation:launchOut .8s ease forwards;
+  animation-delay:2.2s;
+}
+#launch h1{
+  margin:0 0 18px;
+  font-size:30px;
+  font-weight:800;
+}
+#launch span{color:#9aa0a6}
+.loader{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#9aa0a6;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes launchOut{to{opacity:0;pointer-events:none}}
 
-        /* --- CONTENT --- */
-        .content-section { display: none; animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .content-section.active { display: block; }
+/* ===== LAYOUT ===== */
+.app{height:100%;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;padding:20px;padding-bottom:110px}
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- MAIN CARD --- */
-        .main-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px; padding: 40px 20px;
-            text-align: center; margin-bottom: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            position: relative; overflow: hidden;
-        }
-
-        .status-ring {
-            width: 140px; height: 140px; margin: 0 auto 20px;
-            border-radius: 50%; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.2);
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
-        }
-        
-        /* Пульсирующий круг */
-        .pulse-circle {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 2px solid transparent; opacity: 0;
-        }
-        .active-sub .pulse-circle { border-color: var(--success); animation: pulse 2s infinite; }
-        .inactive-sub .pulse-circle { border-color: var(--danger); animation: pulse 2s infinite; }
-
-        .status-icon { font-size: 50px; transition: 0.3s; z-index: 2; }
-        .active-sub .status-icon { color: var(--success); filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.4)); }
-        .inactive-sub .status-icon { color: var(--danger); filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.4)); }
-
-        .status-h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
-        .status-p { font-size: 14px; color: var(--text-sec); margin-top: 6px; }
-
-        @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-
-        /* --- KEY BOX --- */
-        .key-container {
-            background: rgba(0,0,0,0.3); border-radius: 18px; padding: 16px;
-            margin-bottom: 20px; border: 1px dashed rgba(255,255,255,0.1);
-            display: none; transition: 0.3s;
-        }
-        .key-container.show { display: block; animation: slideUp 0.4s; }
-        .key-label { font-size: 11px; color: var(--text-sec); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .key-value { 
-            font-family: 'SF Mono', monospace; font-size: 12px; color: var(--primary); 
-            background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 10px;
-            word-break: break-all; margin-bottom: 12px; max-height: 50px; overflow: hidden;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-        .copy-btn {
-            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); 
-            width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
-        }
-        .copy-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.98); }
-
-        /* --- MAIN BUTTON --- */
-        .action-btn {
-            background: linear-gradient(135deg, var(--primary), #2563eb);
-            color: white; border: none; width: 100%; padding: 18px;
-            border-radius: 20px; font-size: 16px; font-weight: 700; cursor: pointer;
-            box-shadow: 0 10px 30px var(--primary-glow);
-            transition: 0.2s; position: relative; overflow: hidden;
-        }
-        .action-btn:active { transform: scale(0.97); box-shadow: 0 5px 15px var(--primary-glow); }
-        .action-btn::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shine 3s infinite;
-        }
-        @keyframes shine { 100% { left: 100%; } }
-
-        /* --- GUIDE --- */
-        .guide-step { 
-            display: flex; gap: 15px; margin-bottom: 15px; 
-            background: var(--card-bg); padding: 20px; border-radius: 20px;
-            border: 1px solid var(--glass-border); align-items: flex-start;
-        }
-        .gs-icon { 
-            width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); color: var(--primary);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
-        }
-        .gs-content h4 { margin: 0 0 4px 0; font-size: 16px; }
-        .gs-content p { margin: 0; font-size: 13px; color: var(--text-sec); line-height: 1.5; }
-        .app-links { display: flex; gap: 10px; margin-top: 10px; }
-        .app-link { 
-            flex: 1; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; 
-            text-align: center; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600;
-            border: 1px solid var(--glass-border); transition: 0.2s;
-        }
-        .app-link:active { background: rgba(255,255,255,0.1); }
-
-    </style>
-</head>
-<body>
-
-    <div id="splash-screen">
-        <div class="splash-logo">NOVOCHEK VPN</div>
-        <div class="splash-sub">SECURE ACCESS</div>
-        <div class="splash-loader"><div class="splash-bar"></div></div>
-    </div>
-
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-
-    <div class="app-container" id="app">
-        
-        <div class="header">
-            <div class="user-welcome">
-                <h2 id="userName">...</h2>
-                <p id="subStatusText">Загрузка данных...</p>
-            </div>
-        </div>
-
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('home')">Главная</div>
-            <div class="tab" onclick="switchTab('guide')">Инструкция</div>
-        </div>
-
-        <div id="home" class="content-section active">
-            
-            <div class="main-card inactive-sub" id="statusCard">
-                <div class="status-ring">
-                    <div class="pulse-circle"></div>
-                    <i class="fas fa-shield-alt status-icon" id="statusIcon"></i>
-                </div>
-                <h1 class="status-h1" id="statusTitle">Не защищено</h1>
-                <p class="status-p" id="statusDesc">Подключение отсутствует</p>
-            </div>
-
-            <div class="key-container" id="keyBlock">
-                <div class="key-label">ВАШ КЛЮЧ ДОСТУПА</div>
-                <div class="key-value" id="keyString">...</div>
-                <button class="copy-btn" onclick="copyKey()">
-                    <i class="fas fa-copy"></i> СКОПИРОВАТЬ
-                </button>
-            </div>
-
-            <button class="action-btn" onclick="handleMainButton()" id="mainBtn">
-                ПОЛУЧИТЬ ДОСТУП
-            </button>
-        </div>
-
-        <div id="guide" class="content-section">
-            <div class="guide-step">
-                <div class="gs-icon"><i class="fas fa-download"></i></div>
-                <div class="gs-content">
-                    <h4>1. Скачайте приложение</h4>
-                    <p>Выберите версию для вашего устройства:</p>
-                    <div class="app-links">
-                        <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="app-link"><i class="fab fa-apple"></i> iOS</a>
-                        <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" class="app-link"><i class="fab fa-android"></i> Android</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="guide-step">
-                <div class="gs-icon"><i class="fas fa-key"></i></div>
-                <div class="gs-content">
-                    <h4>2. Скопируйте ключ</h4>
-                    <p>Перейдите на вкладку <b>"Главная"</b> и нажмите кнопку <b>"СКОПИРОВАТЬ"</b>.</p>
-                </div>
-            </div>
-
-            <div class="guide-step">
-                <div class="gs-icon"><i class="fas fa-bolt"></i></div>
-                <div class="gs-content">
-                    <h4>3. Подключитесь</h4>
-                    <p>Откройте приложение. Оно само предложит вставить ключ. Нажмите <b>Import</b> и большую кнопку запуска.</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Скрываем сплэш через 2.5 сек
-        setTimeout(() => {
-            document.getElementById('splash-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.display = 'none';
-                document.getElementById('app').style.opacity = '1';
-            }, 800);
-        }, 2200);
-
-        // Данные
-        const urlParams = new URLSearchParams(window.location.search);
-        const status = urlParams.get('status');
-        const date = urlParams.get('date');
-        const key = urlParams.get('key'); 
-
-        // Элементы
-        const els = {
-            card: document.getElementById('statusCard'),
-            icon: document.getElementById('statusIcon'),
-            title: document.getElementById('statusTitle'),
-            desc: document.getElementById('statusDesc'),
-            btn: document.getElementById('mainBtn'),
-            subText: document.getElementById('subStatusText'),
-            keyBlock: document.getElementById('keyBlock'),
-            keyString: document.getElementById('keyString')
-        };
-
-        // Логика отображения
-        if (status === 'active') {
-            els.card.className = 'main-card active-sub';
-            els.icon.className = 'fas fa-shield-check status-icon';
-            els.title.innerText = 'Защита активна';
-            els.desc.innerText = `Истекает: ${date}`;
-            els.btn.innerText = 'ПРОДЛИТЬ ПОДПИСКУ';
-            els.subText.innerText = 'Premium • Active';
-            els.subText.style.color = '#10b981';
-
-            if (key) {
-                els.keyBlock.classList.add('show');
-                els.keyString.innerText = key;
-            }
-        } else {
-            els.card.className = 'main-card inactive-sub';
-            els.icon.className = 'fas fa-lock status-icon';
-            els.title.innerText = 'Нет доступа';
-            els.desc.innerText = 'Трафик не зашифрован';
-            els.btn.innerText = 'КУПИТЬ ДОСТУП — 129₽';
-        }
-
-        // Имя
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('userName').innerText = `Привет, ${tg.initDataUnsafe.user.first_name}!`;
-        }
-
-        // Функции
-        function handleMainButton() {
-            tg.HapticFeedback.impactOccurred('heavy');
-            tg.sendData(JSON.stringify({ action: "buy" }));
-        }
-
-        function copyKey() {
-            if (key) {
-                navigator.clipboard.writeText(key);
-                tg.HapticFeedback.notificationOccurred('success');
-                const btn = document.querySelector('.copy-btn');
-                btn.innerHTML = '<i class="fas fa-check"></i> СКОПИРОВАНО';
-                btn.style.background = 'rgba(16, 185, 129, 0.2)';
-                btn.style.color = '#10b981';
-                setTimeout(() => {
-                    btn.innerHTML = '<i class="fas fa-copy"></i> СКОПИРОВАТЬ';
-                    btn.style.background = '';
-                    btn.style.color = '';
-                }, 2000);
-            }
-        }
-
-        function switchTab(tabId) {
-            tg.HapticFeedback.selectionChanged();
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.content-section').forEach(c => c.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-    </script>
-</body>
-</html>
+/* ===== HEADER ===== */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.user-info h2{margin:0;font-size:26px;font-weight:800}
+.user-info p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.status{
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:20px;
+  background:rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:6px
+}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--
