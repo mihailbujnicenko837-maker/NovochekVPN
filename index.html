@@ -30,13 +30,14 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 🎬 SPLASH SCREEN (ЗАГРУЗКА) --- */
+        /* --- 🎬 ЗАГРУЗКА --- */
         #splash {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease;
         }
         
+        /* ЛОГОТИП */
         .splash-logo {
             width: 160px; height: auto; margin-bottom: 25px;
             filter: drop-shadow(0 0 30px rgba(44, 171, 255, 0.3));
@@ -71,7 +72,7 @@
         .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.8s; }
         .scroll-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: calc(var(--nav-height) + 20px); }
 
-        /* --- ГЛАВНАЯ (HOME) --- */
+        /* --- ГЛАВНАЯ --- */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .user-info h1 { margin: 0; font-size: 24px; font-weight: 700; }
         .user-info p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
@@ -83,7 +84,6 @@
         .status-badge.active { background: rgba(50, 215, 75, 0.15); color: var(--success); border-color: rgba(50, 215, 75, 0.3); box-shadow: 0 0 15px rgba(50,215,75,0.2); }
         .status-badge.inactive { background: rgba(255, 69, 58, 0.15); color: var(--danger); border-color: rgba(255, 69, 58, 0.3); }
 
-        /* КАРТОЧКА ЩИТА */
         .main-card {
             background: var(--card-bg); border: 1px solid var(--glass-border);
             border-radius: 28px; padding: 30px; text-align: center; margin-bottom: 20px;
@@ -106,7 +106,6 @@
 
         @keyframes pulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
 
-        /* ИНФО ПАНЕЛЬ */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-item {
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
@@ -115,7 +114,6 @@
         .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
         .stat-val { font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* КЛЮЧ */
         .key-section { 
             background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border);
             border-radius: 16px; padding: 15px; margin-bottom: 20px; display: none;
@@ -130,7 +128,6 @@
             padding: 10px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer;
         }
 
-        /* ГЛАВНАЯ КНОПКА */
         .main-btn {
             width: 100%; padding: 18px; border-radius: 20px; border: none;
             background: linear-gradient(135deg, #333, #111); color: #fff;
@@ -147,7 +144,7 @@
         .row-l { color: var(--muted); font-size: 14px; }
         .row-r { font-weight: 600; font-size: 14px; }
 
-        /* --- ГАЙД --- */
+        /* --- ГАЙД (ИСПРАВЛЕНО) --- */
         .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .dl-card {
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
@@ -272,11 +269,11 @@
                 <div class="dl-grid">
                     <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="dl-card">
                         <i class="fab fa-apple dl-icon"></i>
-                        <span class="dl-name">iOS (V2Box)</span>
+                        <span class="dl-name">iOS (V2RayTun)</span>
                     </a>
                     <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" class="dl-card">
                         <i class="fab fa-android dl-icon" style="color:#32d74b"></i>
-                        <span class="dl-name">Android</span>
+                        <span class="dl-name">Android (V2RayTun)</span>
                     </a>
                     <a href="https://happ.help/?etext=2202.uMhAMTmHp_-6_vvs2cI7kWJ3c29udWxtYXR4bWhueHY.449955844ef1cfe284ede8115b1efd9e0275735b&yclid=15475165576117616639" class="dl-card dl-full">
                         <i class="fas fa-desktop dl-icon" style="color:#2cabff"></i>
@@ -288,8 +285,8 @@
                     <h3 style="margin:0 0 10px 0; font-size:16px">Инструкция</h3>
                     <ol style="margin:0; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.6">
                         <li>Установите приложение для вашего устройства.</li>
-                        <li>На вкладке <b>Главная</b> скопируйте ключ.</li>
-                        <li>Откройте приложение и нажмите <b>Import</b>.</li>
+                        <li>На вкладке <b>Главная</b> скопируйте ключ (если есть подписка).</li>
+                        <li>Откройте приложение и нажмите <b>Import from Clipboard</b>.</li>
                         <li>Нажмите кнопку подключения.</li>
                     </ol>
                 </div>
@@ -332,7 +329,6 @@
             btn: document.getElementById('actBtn'),
             keyArea: document.getElementById('keyArea'),
             keyTxt: document.getElementById('keyTxt'),
-            // Профиль
             pName: document.getElementById('profName'),
             pId: document.getElementById('profId'),
             pStat: document.getElementById('profStat'),
@@ -388,15 +384,16 @@
             ui.icon.className = "fas fa-shield-alt shield-icon";
             ui.title.innerText = "Вы не защищены";
             ui.desc.innerText = "Трафик не шифруется";
-            ui.btn.innerText = "ПОЛУЧИТЬ ДОСТУП";
+            ui.btn.innerText = "ПОЛУЧИТЬ ДОСТУП — 129₽";
             
             ui.pStat.innerText = "Не активна";
             ui.pStat.style.color = "var(--danger)";
         }
 
-        // КЛИК ПО КНОПКЕ
+        // КЛИК ПО КНОПКЕ (ОТПРАВЛЯЕМ БОТУ)
         function buy() {
             tg.HapticFeedback.impactOccurred('heavy');
+            // ЭТО ВАЖНО: ОТПРАВЛЯЕМ ACTION 'buy', ЧТОБЫ БОТ ПОНЯЛ
             tg.sendData(JSON.stringify({ action: "buy" }));
         }
 
@@ -404,7 +401,7 @@
             if(key) {
                 navigator.clipboard.writeText(key);
                 tg.HapticFeedback.notificationOccurred('success');
-                tg.showPopup({title: 'Готово', message: 'Ключ скопирован в буфер обмена'});
+                tg.showPopup({title: 'Готово', message: 'Ключ скопирован!'});
             }
         }
 
