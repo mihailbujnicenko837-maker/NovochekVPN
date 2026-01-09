@@ -7,168 +7,163 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg: #0b0b0f; --card: #1c1c24; --primary: #007aff; --text: #fff; --gray: #8e8e93; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 20px; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-color: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #2cabff;
+            --accent: #b055ff;
+            --success: #32d74b;
+            --danger: #ff453a;
+            --text-main: #ffffff;
+            --text-sec: rgba(255, 255, 255, 0.6);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- 🌟 ЖИВОЙ ФОН (ORBS) --- */
+        .orb {
+            position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: var(--primary); animation-delay: 0s; }
+        .orb-2 { bottom: -10%; right: -10%; width: 250px; height: 250px; background: var(--accent); animation-delay: -5s; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
+
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.4; }
+
+        .app-container {
+            padding: 20px; padding-bottom: 50px; max-width: 500px; margin: 0 auto;
+            position: relative; z-index: 10;
+        }
+
+        /* --- HEADER --- */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
+        .user-welcome h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #fff, #aebaf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-welcome p { margin: 2px 0 0; font-size: 13px; color: var(--text-sec); }
         
-        /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .user h1 { font-size: 24px; margin: 0; font-weight: 800; }
-        .user p { color: var(--gray); margin: 5px 0 0; font-size: 13px; }
-        .badge { background: rgba(0,122,255,0.15); color: var(--primary); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        /* --- TABS --- */
+        .tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 14px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; color: var(--text-sec); border-radius: 10px; transition: 0.3s; cursor: pointer; }
+        .tab.active { background: var(--glass-bg); color: #fff; font-weight: 600; }
 
-        /* STATUS CARD */
-        .card { background: var(--card); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 15px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .icon-box { width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 35px; color: var(--gray); transition: 0.3s; }
-        .active .icon-box { background: rgba(50,215,75,0.15); color: #32d74b; box-shadow: 0 0 20px rgba(50,215,75,0.2); }
-        .status-text { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .sub-text { color: var(--gray); font-size: 14px; }
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
 
-        /* KEY SECTION */
-        .key-box { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 15px; margin-top: 15px; display: none; }
-        .key-box.show { display: block; }
-        .key-val { font-family: monospace; color: var(--gray); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
-        .copy-btn { background: var(--primary); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        /* --- MAIN CARD --- */
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px; padding: 30px 20px;
+            text-align: center; margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .status-ring {
+            width: 120px; height: 120px; margin: 0 auto 20px;
+            border-radius: 50%; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.2);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.05);
+        }
+        .status-ring::before {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%; padding: 4px; 
+            background: conic-gradient(from 0deg, transparent, var(--danger));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            animation: spin 2s linear infinite; opacity: 0; transition: 0.5s;
+        }
         
-        /* GUIDE GRID */
-        .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .g-item { background: var(--card); padding: 15px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; transition: 0.2s; }
-        .g-item:active { opacity: 0.7; transform: scale(0.98); }
-        .g-icon { font-size: 24px; margin-bottom: 8px; display: block; }
-        .g-name { font-size: 13px; font-weight: 600; }
+        .active-sub .status-ring::before { background: conic-gradient(from 0deg, transparent, var(--success)); opacity: 1; }
+        .active-sub .status-icon { color: var(--success); text-shadow: 0 0 20px rgba(50, 215, 75, 0.6); }
+        .inactive-sub .status-ring::before { background: conic-gradient(from 0deg, transparent, var(--danger)); opacity: 1; }
+        .inactive-sub .status-icon { color: var(--danger); }
 
-        /* ACTION BUTTON */
-        .main-btn { position: fixed; bottom: 30px; left: 20px; right: 20px; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-size: 17px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,122,255,0.3); z-index: 100; cursor: pointer; }
-        
-        /* TABS */
-        .tabs { display: flex; background: var(--card); padding: 5px; border-radius: 16px; margin-bottom: 20px; }
-        .tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 600; color: var(--gray); border-radius: 12px; }
-        .tab.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .status-icon { font-size: 40px; transition: 0.3s; }
+        .status-h1 { font-size: 22px; font-weight: 700; margin: 0; }
+        .status-p { font-size: 14px; color: var(--text-sec); margin-top: 5px; }
 
-        .section { display: none; }
-        .section.active { display: block; }
+        /* --- KEY BOX (НОВОЕ!) --- */
+        .key-container {
+            background: rgba(0,0,0,0.3); border-radius: 16px; padding: 15px;
+            margin-bottom: 20px; border: 1px dashed var(--glass-border);
+            display: none; /* Скрыт по умолчанию */
+        }
+        .key-container.show { display: block; }
+        .key-label { font-size: 12px; color: var(--text-sec); margin-bottom: 8px; text-align: left; }
+        .key-value { 
+            font-family: monospace; font-size: 12px; color: #aebaf8; 
+            background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;
+            word-break: break-all; margin-bottom: 10px; max-height: 60px; overflow: hidden;
+        }
+        .copy-btn {
+            background: var(--glass-bg); color: #fff; border: none; width: 100%; padding: 10px;
+            border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* --- ACTION BUTTON --- */
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), #0051ff);
+            color: white; border: none; width: 100%; padding: 18px;
+            border-radius: 18px; font-size: 16px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 81, 255, 0.3);
+            position: relative; overflow: hidden;
+        }
+
+        /* --- GUIDE --- */
+        .step { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .step-num { 
+            background: var(--glass-bg); width: 30px; height: 30px; 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; color: var(--primary); border: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .step-text h4 { margin: 0 0 5px 0; font-size: 15px; }
+        .step-text p { margin: 0; font-size: 13px; color: var(--text-sec); line-height: 1.4; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <canvas id="snow-canvas"></canvas>
 
-    <div class="header">
-        <div class="user">
-            <h1 id="name">...</h1>
-            <p>ID: <span id="uid">...</span></p>
-        </div>
-        <div class="badge" id="levelBadge">GUEST</div>
-    </div>
-
-    <div class="tabs">
-        <div class="tab active" onclick="setTab('home')">Главная</div>
-        <div class="tab" onclick="setTab('guide')">Инструкция</div>
-    </div>
-
-    <div id="home" class="section active">
-        <div class="card" id="statusCard">
-            <div class="icon-box" id="statusIcon"><i class="fas fa-shield-alt"></i></div>
-            <div class="status-text" id="statusTitle">Не защищено</div>
-            <div class="sub-text" id="statusDesc">Подписка не активна</div>
-            
-            <div class="key-box" id="keySection">
-                <div class="key-val" id="keyText">vless://...</div>
-                <button class="copy-btn" onclick="copyKey()"><i class="fas fa-copy"></i> Скопировать ключ</button>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="card" style="margin:0; padding: 15px;">
-                <div style="font-size:12px; color:var(--gray);">Трафик</div>
-                <div style="font-size:16px; font-weight:700;">∞ GB</div>
-            </div>
-            <div class="card" style="margin:0; padding: 15px;">
-                <div style="font-size:12px; color:var(--gray);">Локация</div>
-                <div style="font-size:16px; font-weight:700;">NL 🇳🇱</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="guide" class="section">
-        <h3 style="margin-bottom:15px;">1. Скачай приложение</h3>
-        <div class="guide-grid">
-            <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="g-item">
-                <i class="fab fa-apple g-icon"></i>
-                <span class="g-name">iPhone</span>
-            </a>
-            <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" class="g-item">
-                <i class="fab fa-android g-icon" style="color:#32d74b;"></i>
-                <span class="g-name">Android</span>
-            </a>
-        </div>
+    <div class="app-container">
         
-        <h3 style="margin-bottom:15px;">2. Подключи</h3>
-        <div class="card" style="text-align: left; padding: 15px;">
-            <div style="display:flex; gap:15px; margin-bottom:10px;">
-                <div style="background:var(--primary); width:25px; height:25px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold;">1</div>
-                <div style="font-size:14px; line-height:1.4;">Скопируй ключ на вкладке <b>Главная</b>.</div>
-            </div>
-            <div style="display:flex; gap:15px;">
-                <div style="background:var(--primary); width:25px; height:25px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold;">2</div>
-                <div style="font-size:14px; line-height:1.4;">Открой приложение и нажми <b>Import from Clipboard</b>.</div>
+        <div class="header">
+            <div class="user-welcome">
+                <h2 id="userName">Привет!</h2>
+                <p id="subStatusText">Загрузка...</p>
             </div>
         </div>
-    </div>
 
-    <button class="main-btn" id="actionBtn" onclick="buy()">КУПИТЬ ДОСТУП</button>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('home')">Главная</div>
+            <div class="tab" onclick="switchTab('guide')">Инструкция</div>
+        </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Данные
-        const user = tg.initDataUnsafe.user;
-        const params = new URLSearchParams(window.location.search);
-        const status = params.get('status');
-        const date = params.get('date');
-        const key = params.get('key'); // ПОЛУЧАЕМ КЛЮЧ ИЗ URL
-
-        // UI
-        if (user) {
-            document.getElementById('name').innerText = user.first_name;
-            document.getElementById('uid').innerText = user.id;
-        }
-
-        if (status === 'active') {
-            document.getElementById('statusCard').classList.add('active');
-            document.getElementById('statusTitle').innerText = 'Активна';
-            document.getElementById('statusDesc').innerText = `Истекает: ${date}`;
-            document.getElementById('statusIcon').innerHTML = '<i class="fas fa-check"></i>';
-            document.getElementById('levelBadge').innerText = 'PRO';
-            document.getElementById('levelBadge').style.color = '#32d74b';
-            document.getElementById('levelBadge').style.background = 'rgba(50,215,75,0.15)';
+        <div id="home" class="content-section active">
             
-            document.getElementById('actionBtn').innerText = 'ПРОДЛИТЬ ПОДПИСКУ';
-            
-            // Показываем ключ
-            if (key) {
-                document.getElementById('keySection').classList.add('show');
-                document.getElementById('keyText').innerText = key;
-            }
-        }
+            <div class="main-card inactive-sub" id="statusCard">
+                <div class="status-ring">
+                    <i class="fas fa-shield-alt status-icon" id="statusIcon"></i>
+                </div>
+                <h1 class="status-h1" id="statusTitle">VPN выключен</h1>
+                <p class="status-p" id="statusDesc">Нет активной подписки</p>
+            </div>
 
-        // Функции
-        function setTab(name) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(name).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function copyKey() {
-            if(key) {
-                navigator.clipboard.writeText(key);
-                tg.showPopup({title: 'Готово', message: 'Ключ скопирован! Вставь его в приложение.'});
-            }
-        }
-
-        function buy() {
-            const data = { action: 'buy' };
-            tg.sendData(JSON.stringify(data));
-        }
-    </script>
-</body>
-</html>
+            <div class="key-container" id="keyBlock">
+                <div class="key-label">ВА
