@@ -143,7 +143,7 @@
         .row-l { color: var(--muted); font-size: 14px; }
         .row-r { font-weight: 600; font-size: 14px; }
 
-        /* --- ГАЙД (ОБНОВЛЕН) --- */
+        /* --- ГАЙД (ОБНОВЛЕННЫЕ ССЫЛКИ) --- */
         .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .dl-card {
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
@@ -155,20 +155,14 @@
         .dl-name { font-size: 13px; font-weight: 600; }
         .dl-full { grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        .step-list {
-            margin: 0; padding: 0; list-style: none;
-        }
-        .step-li {
-            display: flex; gap: 15px; margin-bottom: 20px;
-        }
+        .step-list { margin: 0; padding: 0; list-style: none; }
+        .step-li { display: flex; gap: 15px; margin-bottom: 20px; }
         .step-n {
             width: 28px; height: 28px; background: var(--primary); color: #000;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 14px; flex-shrink: 0;
         }
-        .step-txt {
-            font-size: 13px; color: var(--muted); line-height: 1.5;
-        }
+        .step-txt { font-size: 13px; color: var(--muted); line-height: 1.5; }
         .step-txt strong { color: #fff; }
 
         /* --- НАВИГАЦИЯ --- */
@@ -309,7 +303,7 @@
                         </li>
                         <li class="step-li">
                             <div class="step-n">3</div>
-                            <div class="step-txt">Откройте скачанное приложение (Hiddify/V2Box). Приложение автоматически предложит добавить ключ из буфера обмена. Если нет — нажмите кнопку <strong>Import from Clipboard</strong> или <strong>Добавить</strong>.</div>
+                            <div class="step-txt">Откройте скачанное приложение (Hiddify/V2RayTun). Приложение автоматически предложит добавить ключ из буфера обмена. Если нет — нажмите кнопку <strong>Import from Clipboard</strong> или <strong>Добавить</strong>.</div>
                         </li>
                         <li class="step-li">
                             <div class="step-n">4</div>
@@ -417,11 +411,13 @@
             ui.pStat.style.color = "var(--danger)";
         }
 
-        // КЛИК ПО КНОПКЕ (ОТПРАВЛЯЕМ БОТУ)
+        // КЛИК ПО КНОПКЕ (ОТПРАВЛЯЕМ БОТУ И ЗАКРЫВАЕМ)
         function buy() {
             tg.HapticFeedback.impactOccurred('heavy');
-            // ЭТО ВАЖНО: ОТПРАВЛЯЕМ ACTION 'buy', ЧТОБЫ БОТ ПОНЯЛ
+            // ЭТО ОТПРАВЛЯЕТ ДАННЫЕ БОТУ
             tg.sendData(JSON.stringify({ action: "buy" }));
+            // ЭТО ЗАКРЫВАЕТ ОКНО (На всякий случай, хотя sendData обычно сам закрывает)
+            // tg.close(); 
         }
 
         function copyKey() {
