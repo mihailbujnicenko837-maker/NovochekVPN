@@ -8,25 +8,22 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Цвета под стиль аватарки (Хром + Тьма) */
+            /* Строгий темный стиль (Сталь + Неон) */
             --bg-color: #050505;
-            --card-bg: rgba(30, 30, 35, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            
-            /* Градиент хрома для текста */
-            --chrome-text: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
-            
-            --primary: #2cabff; /* Акцент (как на кнопках) */
+            --glass-bg: rgba(30, 30, 35, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #2cabff;
             --success: #32d74b;
             --danger: #ff453a;
-            --text-main: #e0e0e0;
+            --text-main: #ffffff;
             --text-sec: #8e8e93;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000000 70%);
+            /* Радиальный градиент: от темно-синего к черному */
+            background-image: radial-gradient(circle at 50% 0%, #151525 0%, #000000 80%);
             color: var(--text-main);
             margin: 0; padding: 0;
             min-height: 100vh;
@@ -34,179 +31,152 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 🎬 СПЛЭШ-ЭКРАН (ЗАГРУЗКА) --- */
+        /* --- 🎬 КИНЕМАТОГРАФИЧНЫЙ СПЛЭШ-ЭКРАН --- */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
+            background: #000000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease-out;
-        }
-        
-        .splash-icon {
-            font-size: 60px; color: #fff;
-            background: linear-gradient(135deg, #fff 0%, #777 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            animation: pulseShield 2s infinite;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
         }
 
-        .splash-title {
-            font-size: 32px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 20%, #666 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 10px rgba(255,255,255,0.1);
-            opacity: 0; transform: scale(0.9);
-            animation: logoIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-        
-        .splash-bar-container {
-            width: 120px; height: 3px; background: #222; border-radius: 2px; margin-top: 20px; overflow: hidden;
-            opacity: 0; animation: fadeIn 0.5s 0.5s forwards;
-        }
-        .splash-bar {
-            width: 100%; height: 100%; background: #fff;
-            transform: translateX(-100%);
-            animation: loadBar 1.5s 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        .splash-logo-img {
+            width: 180px; /* Размер лого */
+            height: auto;
+            /* Эффект дыхания и свечения */
+            animation: breathe 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 30px rgba(44, 171, 255, 0.2)); 
+            margin-bottom: 30px;
         }
 
-        @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes loadBar { to { transform: translateX(0); } }
-        @keyframes pulseShield { 0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,255,255,0)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); } 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255,255,255,0)); } }
+        .loader-line {
+            width: 140px; height: 3px; background: #1a1a1a; border-radius: 2px;
+            overflow: hidden; position: relative;
+        }
+        .loader-fill {
+            width: 50%; height: 100%; background: var(--primary);
+            position: absolute; top: 0; left: 0;
+            animation: load 1.5s infinite ease-in-out;
+            box-shadow: 0 0 10px var(--primary);
+        }
 
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(44, 171, 255, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 45px rgba(44, 171, 255, 0.5)); }
+        }
+        @keyframes load {
+            0% { left: -50%; } 100% { left: 100%; }
+        }
 
-        /* --- КОНТЕЙНЕР --- */
+        /* --- ОСНОВНОЙ КОНТЕЙНЕР --- */
         .app-container {
             padding: 20px; padding-bottom: 50px; max-width: 500px; margin: 0 auto;
             position: relative; z-index: 10; opacity: 0; transition: opacity 1s;
         }
 
-        /* --- ХЕДЕР --- */
+        /* --- HEADER --- */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
-        .user-welcome h2 { 
-            margin: 0; font-size: 24px; font-weight: 800; 
-            background: linear-gradient(90deg, #fff, #b0b0b0); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-        }
-        .user-welcome p { margin: 4px 0 0; font-size: 13px; color: var(--text-sec); }
+        .user-welcome h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #fff, #a0a0a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-welcome p { margin: 2px 0 0; font-size: 13px; color: var(--text-sec); }
         
-        /* --- ВКЛАДКИ (ВЕРХУ) --- */
+        /* --- TABS --- */
         .tabs { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 16px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
-        .tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sec); border-radius: 12px; transition: 0.3s; cursor: pointer; }
-        .tab.active { background: rgba(255,255,255,0.1); color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; color: var(--text-sec); border-radius: 10px; transition: 0.3s; cursor: pointer; font-weight: 600; }
+        .tab.active { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
-        .content-section { display: none; animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .content-section { display: none; animation: slideUp 0.5s; }
         .content-section.active { display: block; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- КАРТОЧКА СТАТУСА --- */
         .main-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
             border-radius: 30px; padding: 35px 20px;
             text-align: center; margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             position: relative; overflow: hidden;
         }
-        
-        /* Металлический блик на карточке */
-        .main-card::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-20deg);
-            animation: shineCard 6s infinite; pointer-events: none;
-        }
-        @keyframes shineCard { 0%, 50% { left: -100%; } 100% { left: 200%; } }
 
         .status-ring {
-            width: 120px; height: 120px; margin: 0 auto 20px;
+            width: 130px; height: 130px; margin: 0 auto 20px;
             border-radius: 50%; position: relative;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.4);
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
         }
         
-        .pulse-border {
-            position: absolute; inset: -3px; border-radius: 50%;
+        .pulse-circle {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
             border: 2px solid transparent; opacity: 0;
         }
         
-        /* Цвета статусов */
-        .active-sub .pulse-border { border-color: var(--success); animation: spinPulse 3s infinite linear; }
-        .active-sub .status-icon { color: var(--success); filter: drop-shadow(0 0 15px rgba(50,215,75,0.4)); }
+        /* Статусы */
+        .active-sub .pulse-circle { border-color: var(--success); animation: pulse 2s infinite; }
+        .active-sub .status-icon { color: var(--success); filter: drop-shadow(0 0 15px rgba(50,215,75,0.5)); }
         
-        .inactive-sub .pulse-border { border-color: var(--danger); }
-        .inactive-sub .status-icon { color: var(--danger); filter: drop-shadow(0 0 15px rgba(255, 69, 58, 0.4)); }
+        .inactive-sub .pulse-circle { border-color: var(--danger); }
+        .inactive-sub .status-icon { color: var(--danger); filter: drop-shadow(0 0 15px rgba(255, 69, 58, 0.5)); }
 
-        .status-icon { font-size: 45px; transition: 0.3s; z-index: 2; }
-        .status-h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
-        .status-p { font-size: 14px; color: var(--text-sec); margin-top: 5px; }
+        .status-icon { font-size: 50px; transition: 0.3s; z-index: 2; }
+        .status-h1 { font-size: 22px; font-weight: 700; margin: 0; }
+        .status-p { font-size: 14px; color: var(--text-sec); margin-top: 6px; }
 
-        @keyframes spinPulse { 
-            0% { transform: rotate(0deg); opacity: 0.5; } 
-            50% { opacity: 1; } 
-            100% { transform: rotate(360deg); opacity: 0.5; } 
-        }
+        @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 
-        /* --- КЛЮЧ --- */
+        /* --- БЛОК КЛЮЧА --- */
         .key-container {
-            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 15px;
+            background: rgba(0,0,0,0.3); border-radius: 16px; padding: 15px;
             margin-bottom: 20px; border: 1px dashed rgba(255,255,255,0.2);
             display: none; text-align: left;
         }
         .key-container.show { display: block; animation: slideUp 0.4s; }
-        .key-label { font-size: 11px; color: var(--text-sec); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
+        .key-label { font-size: 11px; color: var(--text-sec); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .key-value { 
             font-family: monospace; font-size: 12px; color: #fff; 
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;
-            word-break: break-all; margin-bottom: 10px; max-height: 60px; overflow: hidden;
-            border-left: 3px solid var(--primary);
+            background: rgba(44, 171, 255, 0.1); padding: 12px; border-radius: 8px;
+            word-break: break-all; margin-bottom: 12px; max-height: 60px; overflow: hidden;
+            border-left: 2px solid var(--primary);
         }
         .copy-btn {
-            background: rgba(255,255,255,0.1); color: #fff; border: none; width: 100%; padding: 10px;
-            border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
+            width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
         }
-        .copy-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.98); }
+        .copy-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.15); }
 
         /* --- КНОПКА ДЕЙСТВИЯ --- */
         .action-btn {
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            color: white; border: 1px solid rgba(255,255,255,0.2); 
-            width: 100%; padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; 
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            transition: 0.3s;
+            background: linear-gradient(135deg, var(--primary), #0051ff);
+            color: white; border: none; width: 100%; padding: 18px;
+            border-radius: 20px; font-size: 16px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 81, 255, 0.3);
+            position: relative; overflow: hidden; transition: 0.3s;
         }
-        /* Синяя подсветка при активности */
-        .active-mode .action-btn { background: linear-gradient(135deg, var(--primary), #0051ff); border: none; }
         .action-btn:active { transform: scale(0.97); }
 
         /* --- ИНСТРУКЦИЯ --- */
-        .guide-step { 
-            display: flex; gap: 15px; margin-bottom: 15px; 
-            background: rgba(255,255,255,0.03); padding: 18px; border-radius: 18px; 
-            border: 1px solid var(--glass-border);
+        .step { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; border: 1px solid var(--glass-border); }
+        .step-num { 
+            background: var(--glass-bg); width: 30px; height: 30px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; color: var(--primary); border: 1px solid rgba(255,255,255,0.2);
+            flex-shrink: 0; box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .gs-num { 
-            width: 30px; height: 30px; background: linear-gradient(135deg, #fff, #999); color: #000;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px; flex-shrink: 0; box-shadow: 0 2px 10px rgba(255,255,255,0.2);
-        }
-        .gs-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 15px; }
-        .gs-text p { margin: 0; font-size: 13px; color: var(--text-sec); line-height: 1.4; }
+        .step-text h4 { margin: 0 0 5px 0; font-size: 15px; color: #fff; }
+        .step-text p { margin: 0; font-size: 13px; color: var(--text-sec); line-height: 1.4; }
 
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <i class="fas fa-shield-alt splash-icon"></i>
-        <div class="splash-title">Novochek<br>VPN</div>
-        <div class="splash-bar-container"><div class="splash-bar"></div></div>
+        <img src="logo.png.png" alt="Novochek VPN" class="splash-logo-img">
+        <div class="loader-line"><div class="loader-fill"></div></div>
     </div>
+
+    <div style="position: fixed; top: -20%; left: -20%; width: 400px; height: 400px; background: var(--primary); border-radius: 50%; filter: blur(120px); opacity: 0.2; z-index: -1;"></div>
+    <div style="position: fixed; bottom: -20%; right: -20%; width: 300px; height: 300px; background: #5500ff; border-radius: 50%; filter: blur(120px); opacity: 0.2; z-index: -1;"></div>
 
     <div class="app-container" id="app">
         
@@ -226,8 +196,8 @@
             
             <div class="main-card inactive-sub" id="statusCard">
                 <div class="status-ring">
-                    <div class="pulse-border"></div>
-                    <i class="fas fa-lock status-icon" id="statusIcon"></i>
+                    <div class="pulse-circle"></div>
+                    <i class="fas fa-shield-alt status-icon" id="statusIcon"></i>
                 </div>
                 <h1 class="status-h1" id="statusTitle">Не защищено</h1>
                 <p class="status-p" id="statusDesc">Нет активной подписки</p>
@@ -242,33 +212,33 @@
             </div>
 
             <button class="action-btn" onclick="handleMainButton()" id="mainBtn">
-                ПОЛУЧИТЬ ДОСТУП
+                КУПИТЬ ДОСТУП — 129₽
             </button>
         </div>
 
         <div id="guide" class="content-section">
-            <div class="guide-step">
-                <div class="gs-num">1</div>
-                <div class="gs-text">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">
                     <h4>Скачай приложение</h4>
                     <p>
-                        <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" style="color:var(--primary)">iPhone (V2Box)</a> • 
-                        <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" style="color:var(--primary)">Android (Hiddify)</a>
+                        <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" style="color:var(--primary); text-decoration:none;">iPhone (V2Box)</a> • 
+                        <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" style="color:var(--primary); text-decoration:none;">Android (Hiddify)</a>
                     </p>
                 </div>
             </div>
-            <div class="guide-step">
-                <div class="gs-num">2</div>
-                <div class="gs-text">
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">
                     <h4>Скопируй ключ</h4>
-                    <p>На вкладке "Главная" нажми кнопку <b>Скопировать</b>.</p>
+                    <p>На вкладке "Главная" появится ключ. Нажми кнопку "Скопировать".</p>
                 </div>
             </div>
-            <div class="guide-step">
-                <div class="gs-num">3</div>
-                <div class="gs-text">
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">
                     <h4>Подключись</h4>
-                    <p>Открой приложение. Оно само найдет ключ. Нажми <b>Import</b> и большую кнопку <b>Старт</b>.</p>
+                    <p>Открой приложение. Нажми <b>"Import from Clipboard"</b> и затем большую кнопку подключения.</p>
                 </div>
             </div>
         </div>
@@ -279,23 +249,23 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Анимация сплэш-экрана
+        // 🎬 ЛОГИКА ЗАПУСКА
         window.onload = function() {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
                 document.getElementById('app').style.opacity = '1';
-                setTimeout(() => splash.style.display = 'none', 800);
-            }, 2000); // 2 секунды заставка
+            }, 2500); // 2.5 секунды анимации логотипа
         };
 
-        // Данные
+        // ДАННЫЕ ОТ БОТА
         const urlParams = new URLSearchParams(window.location.search);
         const status = urlParams.get('status');
         const date = urlParams.get('date');
         const key = urlParams.get('key'); 
 
-        // Элементы
+        // ЭЛЕМЕНТЫ
         const els = {
             card: document.getElementById('statusCard'),
             icon: document.getElementById('statusIcon'),
@@ -304,20 +274,16 @@
             btn: document.getElementById('mainBtn'),
             subText: document.getElementById('subStatusText'),
             keyBlock: document.getElementById('keyBlock'),
-            keyString: document.getElementById('keyString'),
-            homeSection: document.getElementById('home')
+            keyString: document.getElementById('keyString')
         };
 
-        // Логика
+        // ЛОГИКА ОТОБРАЖЕНИЯ
         if (status === 'active') {
             els.card.className = 'main-card active-sub';
-            els.icon.className = 'fas fa-shield-alt status-icon';
+            els.icon.className = 'fas fa-check status-icon';
             els.title.innerText = 'Защита активна';
             els.desc.innerText = `Истекает: ${date}`;
-            
             els.btn.innerText = 'ПРОДЛИТЬ ПОДПИСКУ';
-            els.homeSection.classList.add('active-mode'); // Для синей кнопки
-            
             els.subText.innerText = 'Premium • Active';
             els.subText.style.color = '#32d74b';
 
@@ -330,17 +296,17 @@
             els.icon.className = 'fas fa-lock status-icon';
             els.title.innerText = 'Нет доступа';
             els.desc.innerText = 'Трафик не зашифрован';
-            els.btn.innerText = 'КУПИТЬ ДОСТУП';
+            els.btn.innerText = 'КУПИТЬ ДОСТУП — 129₽';
         }
 
-        // Имя
+        // ИМЯ ПОЛЬЗОВАТЕЛЯ
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('userName').innerText = `Привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
-        // Кнопки
+        // ФУНКЦИИ
         function handleMainButton() {
-            tg.HapticFeedback.impactOccurred('heavy');
+            tg.HapticFeedback.impactOccurred('medium');
             tg.sendData(JSON.stringify({ action: "buy" }));
         }
 
@@ -350,10 +316,12 @@
                 tg.HapticFeedback.notificationOccurred('success');
                 const btn = document.querySelector('.copy-btn');
                 btn.innerHTML = '<i class="fas fa-check"></i> СКОПИРОВАНО';
-                btn.style.background = 'rgba(255,255,255,0.2)';
+                btn.style.background = 'rgba(16, 185, 129, 0.2)';
+                btn.style.color = '#10b981';
                 setTimeout(() => {
                     btn.innerHTML = '<i class="fas fa-copy"></i> СКОПИРОВАТЬ';
                     btn.style.background = '';
+                    btn.style.color = '';
                 }, 2000);
             }
         }
