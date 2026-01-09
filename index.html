@@ -1,259 +1,386 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Novochek VPN</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Novochek VPN</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f0f11;
+            --glass-bg: rgba(30, 30, 35, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary: #2cabff;
+            --success: #32d74b;
+            --danger: #ff453a;
+            --text-main: #ffffff;
+            --text-sec: #8e8e93;
+            --nav-height: 80px;
+        }
 
-<style>
-:root {
-  --bg: #0b0b0d;
-  --glass: rgba(20,20,25,0.6);
-  --glass-active: rgba(20, 30, 25, 0.7);
-  --border: rgba(255,255,255,0.08);
-  --primary: #2cabff;
-  --success: #32d74b;
-  --text: #fff;
-  --muted: #8e8e93;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% -20%, #1c1c3d 0%, #000000 100%);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            height: 100vh;
+            overflow: hidden; /* Скролл внутри секций */
+            -webkit-tap-highlight-color: transparent;
+        }
 
-/* ===== RESET ===== */
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Roboto;
-  background: var(--bg);
-  color:var(--text);
-  height:100vh;
-  overflow:hidden;
-}
+        /* --- ❄️ ФОН --- */
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.3; }
+        .orb { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; opacity: 0.5; }
+        .orb-1 { top: -10%; left: -20%; width: 300px; height: 300px; background: var(--primary); }
+        .orb-2 { bottom: 10%; right: -20%; width: 200px; height: 200px; background: #7000ff; }
 
-/* ===== BACKGROUND IMAGE ===== */
-body::before {
-  content:"";
-  position:fixed;
-  inset:0;
-  /* Убедись, что картинка лежит рядом с файлом index.html */
-  background:url("bg.jpg.jpg") center/cover no-repeat;
-  filter: grayscale(100%) blur(8px) contrast(1.1);
-  opacity:0.28;
-  z-index:-3;
-}
+        /* --- ЛЕЙАУТ --- */
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
 
-/* DARK OVERLAY */
-body::after {
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at top, rgba(0,0,0,.2), rgba(0,0,0,.9)),
-    linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,.95));
-  z-index:-2;
-}
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 100px; /* Отступ под меню */
+        }
 
-/* ===== FILM GRAIN ===== */
-.grain {
-  pointer-events:none;
-  position:fixed;
-  inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/ %3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
-  opacity:.15;
-  z-index:5;
-}
-
-/* ===== SPLASH SCREEN ===== */
-#splash {
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:100;
-  animation: splashOut 1s ease forwards;
-  animation-delay:2.2s;
-}
-#splash h1 {
-  font-size:32px;
-  letter-spacing:-0.5px;
-  animation: logoIn 1.2s ease;
-}
-#splash span {
-  color:var(--primary);
-}
-@keyframes logoIn {
-  from {opacity:0; transform:scale(.9);}
-  to {opacity:1; transform:scale(1);}
-}
-@keyframes splashOut {
-  to {opacity:0; pointer-events:none;}
-}
-
-/* ===== APP ===== */
-.app {
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-
-/* ===== GLASS CARDS ===== */
-.card {
-  background:var(--glass);
-  backdrop-filter: blur(25px);
-  border:1px solid var(--border);
-  border-radius:26px;
-  padding:24px;
-  box-shadow:0 20px 50px rgba(0,0,0,.4);
-  transition: 0.3s;
-}
-
-/* ===== SECTIONS TRANSITION ===== */
-.sections {
-  flex:1;
-  position:relative;
-  padding:20px;
-}
-.section {
-  position:absolute;
-  inset:20px;
-  opacity:0;
-  transform: translateX(40px) scale(.97);
-  filter: blur(8px);
-  transition: .45s cubic-bezier(.2,.8,.2,1);
-  pointer-events:none;
-}
-.section.active {
-  opacity:1;
-  transform: translateX(0) scale(1);
-  filter: blur(0);
-  pointer-events:auto;
-}
-
-/* ===== BUTTON ===== */
-.btn {
-  background:linear-gradient(135deg,#2cabff,#1e7cff);
-  border:none;
-  color:#fff;
-  padding:18px;
-  width:100%;
-  border-radius:18px;
-  font-weight:700;
-  font-size: 16px;
-  box-shadow:0 12px 30px rgba(44,171,255,.35);
-  margin-top: 20px;
-  cursor: pointer;
-}
-.btn:active {transform:scale(.96);}
-
-/* ===== KEY BOX (Новое) ===== */
-.key-container {
-    margin-top: 15px;
-    background: rgba(0,0,0,0.3);
-    border: 1px dashed var(--border);
-    border-radius: 16px;
-    padding: 15px;
-    display: none; /* Скрыто по умолчанию */
-}
-.key-container.show { display: block; }
-.key-text {
-    font-family: monospace;
-    font-size: 12px;
-    color: var(--primary);
-    word-break: break-all;
-    max-height: 50px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    opacity: 0.8;
-}
-.copy-btn {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    border: none;
-    width: 100%;
-    padding: 10px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* ===== NAV ===== */
-.nav {
-  height:80px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  background:rgba(15,15,18,.75);
-  backdrop-filter:blur(25px);
-  border-top:1px solid var(--border);
-  position: relative;
-  z-index: 50;
-}
-.nav button {
-  background:none;
-  border:none;
-  color:var(--muted);
-  font-size:12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.nav button i { font-size: 20px; margin-bottom: 2px; }
-.nav button.active {color:var(--primary);}
-
-/* Helper classes */
-.text-success { color: var(--success) !important; }
-.text-danger { color: var(--danger) !important; }
-</style>
-</head>
-
-<body>
-<div id="splash">
-  <h1>Novochek <span>VPN</span></h1>
-</div>
-
-<div class="grain"></div>
-
-<div class="app">
-  <div class="sections">
-
-    <div class="section active" id="home">
-      <div class="card" id="mainCard">
-        <h2 id="statusTitle">Вы не защищены</h2>
-        <p style="color:var(--muted)" id="statusDesc">Подключите VPN для защиты</p>
+        /* --- HEADER --- */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; padding-top: 10px;
+        }
+        .user-info h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .user-info p { margin: 4px 0 0; font-size: 13px; color: var(--text-sec); }
         
-        <div class="key-container" id="keyBlock">
-            <div class="key-text" id="keyString">...</div>
-            <button class="copy-btn" onclick="copyKey()">Скопировать ключ</button>
+        .status-badge {
+            font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .status-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        /* --- MAIN CARD --- */
+        .main-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px; padding: 40px 20px;
+            text-align: center; margin-bottom: 20px;
+            position: relative; overflow: hidden;
+        }
+        
+        .shield-container {
+            width: 140px; height: 140px; margin: 0 auto 20px;
+            background: rgba(0,0,0,0.3); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; border: 1px solid var(--glass-border);
+        }
+        .shield-icon { font-size: 60px; color: var(--text-sec); transition: 0.5s; }
+        
+        .pulse-ring {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 2px solid transparent; animation: pulse 2s infinite;
+        }
+
+        .main-card.active .shield-icon { color: var(--success); filter: drop-shadow(0 0 15px rgba(50,215,75,0.5)); }
+        .main-card.active .pulse-ring { border-color: var(--success); }
+        
+        .card-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .card-desc { font-size: 14px; color: var(--text-sec); margin-bottom: 0; }
+
+        /* --- INFO GRID --- */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .info-box {
+            background: rgba(255,255,255,0.03); border-radius: 20px; padding: 16px;
+            border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 5px;
+        }
+        .info-label { font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-value { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+        /* --- BUTTON --- */
+        .action-btn {
+            background: var(--primary); color: #fff; border: none; width: 100%; padding: 18px;
+            border-radius: 20px; font-size: 16px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(44, 171, 255, 0.3);
+            transition: transform 0.2s;
+        }
+        .action-btn:active { transform: scale(0.97); }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
+            background: rgba(20, 20, 23, 0.85); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom); z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: var(--text-sec); font-size: 10px; font-weight: 500;
+            background: none; border: none; padding: 10px; width: 60px;
+            transition: 0.3s;
+        }
+        .nav-item i { font-size: 22px; margin-bottom: 2px; transition: 0.3s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-3px); }
+
+        /* --- SECTIONS --- */
+        .section { display: none; animation: fadein 0.3s; }
+        .section.active { display: block; }
+
+        /* --- PROFILE LIST --- */
+        .profile-list { display: flex; flex-direction: column; gap: 10px; }
+        .profile-item {
+            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--glass-border);
+        }
+        .pi-left { display: flex; align-items: center; gap: 12px; }
+        .pi-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .pi-text h4 { margin: 0; font-size: 14px; font-weight: 600; }
+        .pi-text p { margin: 2px 0 0; font-size: 12px; color: var(--text-sec); }
+        .pi-right { font-size: 14px; font-weight: 600; color: var(--text-main); }
+
+        /* --- GUIDE --- */
+        .guide-step { 
+            display: flex; gap: 15px; margin-bottom: 20px; 
+            background: rgba(255,255,255,0.02); padding: 15px; border-radius: 18px; 
+        }
+        .gs-num { 
+            width: 28px; height: 28px; background: var(--primary); color: #000;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; flex-shrink: 0;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+        @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <canvas id="snow-canvas"></canvas>
+
+    <div class="app-container">
+        <div class="scrollable-content">
+            
+            <div class="header">
+                <div class="user-info">
+                    <h2 id="userName">Привет!</h2>
+                    <p>Novochek VPN</p>
+                </div>
+                <div class="status-badge">
+                    <div class="status-dot" id="headerDot"></div>
+                    <span id="headerStatus">Disconnected</span>
+                </div>
+            </div>
+
+            <div id="home" class="section active">
+                <div class="main-card" id="mainCard">
+                    <div class="shield-container">
+                        <div class="pulse-ring" id="pulseRing" style="display:none;"></div>
+                        <i class="fas fa-shield-alt shield-icon" id="shieldIcon"></i>
+                    </div>
+                    <h3 class="card-title" id="statusTitle">Вы не защищены</h3>
+                    <p class="card-desc" id="statusDesc">Нажмите кнопку ниже, чтобы купить подписку</p>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-box">
+                        <span class="info-label">Ваш IP Адрес</span>
+                        <span class="info-value" id="userIp"><i class="fas fa-spinner fa-spin"></i></span>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-label">Локация</span>
+                        <span class="info-value" id="userLoc">...</span>
+                    </div>
+                </div>
+
+                <button class="action-btn" id="actionBtn" onclick="handleAction()">
+                    <i class="fas fa-bolt"></i> ПОЛУЧИТЬ ДОСТУП
+                </button>
+            </div>
+
+            <div id="profile" class="section">
+                <h3 style="margin-bottom: 15px;">Мой аккаунт</h3>
+                <div class="profile-list">
+                    <div class="profile-item">
+                        <div class="pi-left">
+                            <div class="pi-icon"><i class="fas fa-id-card"></i></div>
+                            <div class="pi-text"><h4>Ваш ID</h4><p>Telegram ID</p></div>
+                        </div>
+                        <div class="pi-right" id="userId">...</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-left">
+                            <div class="pi-icon"><i class="fas fa-clock"></i></div>
+                            <div class="pi-text"><h4>Подписка</h4><p>Дата окончания</p></div>
+                        </div>
+                        <div class="pi-right" id="subDate" style="color: var(--text-sec);">Нет активной</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-left">
+                            <div class="pi-icon"><i class="fas fa-server"></i></div>
+                            <div class="pi-text"><h4>Протокол</h4><p>Тип соединения</p></div>
+                        </div>
+                        <div class="pi-right">VLESS Reality</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="font-size: 12px; color: var(--text-sec);">Есть вопросы? Пишите в поддержку</p>
+                    <button onclick="tg.openTelegramLink('https://t.me/Ajdaha61')" style="background: rgba(255,255,255,0.1); border:none; padding: 10px 20px; color:#fff; border-radius: 12px; margin-top: 5px;">Написать Админу</button>
+                </div>
+            </div>
+
+            <div id="guide" class="section">
+                <h3 style="margin-bottom: 15px;">Как подключиться?</h3>
+                <div class="guide-step">
+                    <div class="gs-num">1</div>
+                    <div style="flex:1">
+                        <h4 style="margin:0 0 5px 0;">Скачайте приложение</h4>
+                        <p style="font-size:12px; color:var(--text-sec); margin:0;">
+                            iPhone: <a href="#" onclick="tg.openLink('https://apps.apple.com/ru/app/v2raytun/id6476628951')" style="color:var(--primary)">V2Box</a><br>
+                            Android: <a href="#" onclick="tg.openLink('https://play.google.com/store/apps/details?id=com.v2raytun.android')" style="color:var(--primary)">Hiddify</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="gs-num">2</div>
+                    <div style="flex:1">
+                        <h4 style="margin:0 0 5px 0;">Скопируйте ключ</h4>
+                        <p style="font-size:12px; color:var(--text-sec); margin:0;">Купите подписку в боте, он выдаст ключ (vless://...). Нажмите на него, чтобы скопировать.</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="gs-num">3</div>
+                    <div style="flex:1">
+                        <h4 style="margin:0 0 5px 0;">Подключите</h4>
+                        <p style="font-size:12px; color:var(--text-sec); margin:0;">Откройте приложение. Оно само предложит вставить ключ. Нажмите Import и кнопку Старт.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <button class="btn" id="mainBtn" onclick="handleAction()">Получить доступ</button>
-      </div>
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('home', this)">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('profile', this)">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('guide', this)">
+                <i class="fas fa-book"></i>
+                <span>Гайд</span>
+            </button>
+        </nav>
     </div>
 
-    <div class="section" id="profile">
-      <div class="card">
-        <h2>Профиль</h2>
-        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <span style="color:var(--muted)">Имя</span>
-                <span id="profileName">...</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <span style="color:var(--muted)">ID</span>
-                <span id="profileId">...</span>
-            </div>
-            <div style="display:flex; justify-content:space-between;">
-                <span style="color:var(--muted)">Истекает</span>
-                <span id="profileExp">Нет подписки</span>
-            </div>
-        </div>
-      </div>
-    </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
 
-    <div class="section" id="guide">
-      <div class="card">
-        <h2>Инструкция</h2>
-        <div style="display
+        // Данные пользователя
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('userName').innerText = `Привет, ${user.first_name}!`;
+            document.getElementById('userId').innerText = user.id;
+        }
+
+        // Параметры из URL (от бота)
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status') || 'inactive';
+        const date = urlParams.get('date');
+
+        // Элементы
+        const els = {
+            card: document.getElementById('mainCard'),
+            title: document.getElementById('statusTitle'),
+            desc: document.getElementById('statusDesc'),
+            btn: document.getElementById('actionBtn'),
+            dot: document.getElementById('headerDot'),
+            headStat: document.getElementById('headerStatus'),
+            pulse: document.getElementById('pulseRing'),
+            subDate: document.getElementById('subDate')
+        };
+
+        // Логика UI
+        if (status === 'active') {
+            els.card.classList.add('active');
+            els.title.innerText = 'Защита активна';
+            els.desc.innerText = 'Ваш трафик зашифрован';
+            els.desc.style.color = '#32d74b';
+            els.btn.innerHTML = '<i class="fas fa-check"></i> ПРОДЛИТЬ ПОДПИСКУ';
+            els.dot.classList.add('active');
+            els.headStat.innerText = 'Connected';
+            els.pulse.style.display = 'block';
+            if(date) els.subDate.innerText = date;
+            els.subDate.style.color = '#32d74b';
+        }
+
+        // Получение IP (фейковое определение для красоты)
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('userIp').innerText = data.ip;
+                document.getElementById('userLoc').innerHTML = `<img src="https://flagcdn.com/16x12/${data.country_code.toLowerCase()}.png"> ${data.city}`;
+                
+                // Если страна RU - значит VPN выключен
+                if(data.country_code === 'RU' && status === 'active') {
+                    els.desc.innerText = 'Подписка активна, но VPN не включен!';
+                    els.desc.style.color = '#ff9f0a';
+                }
+            })
+            .catch(() => {
+                document.getElementById('userIp').innerText = 'Скрыт';
+            });
+
+        // Навигация
+        function switchTab(tabId, btn) {
+            tg.HapticFeedback.selectionChanged();
+            
+            // Скрыть все секции
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            // Показать нужную
+            document.getElementById(tabId).classList.add('active');
+            
+            // Обновить кнопки
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Кнопка действия
+        function handleAction() {
+            tg.HapticFeedback.impactOccurred('medium');
+            const data = { action: "buy_subscription", price: 129 };
+            tg.sendData(JSON.stringify(data));
+        }
+
+        // Снег
+        (function() {
+            const c = document.getElementById('snow-canvas'), ctx = c.getContext('2d');
+            let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
+            const flakes = Array.from({length: 30}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+1, s: Math.random()*1+0.5}));
+            function loop() {
+                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.beginPath();
+                flakes.forEach(f => { f.y += f.s; f.x += Math.sin(f.y/50)*0.5; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
+                ctx.fill(); requestAnimationFrame(loop);
+            }
+            loop();
+        })();
+    </script>
+</body>
+</html>
