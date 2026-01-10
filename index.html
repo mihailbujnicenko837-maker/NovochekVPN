@@ -6,6 +6,7 @@
     <title>Novochek VPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #050505;
@@ -21,7 +22,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif; /* НОВЫЙ ШРИФТ */
             background-color: var(--bg);
             background-image: radial-gradient(circle at 50% -20%, #151530 0%, #000000 80%);
             color: var(--text);
@@ -30,92 +31,75 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 🎬 ЗАГРУЗКА --- */
+        /* ❄️ СНЕГ (ВЕРНУЛСЯ!) */
+        #snow-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.4;
+        }
+
+        /* ЗАГРУЗКА */
         #splash {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease;
         }
-        
         .splash-logo {
             width: 160px; height: auto; margin-bottom: 25px;
             filter: drop-shadow(0 0 30px rgba(44, 171, 255, 0.3));
             animation: breathe 3s infinite ease-in-out;
         }
-        
-        .splash-title {
-            font-size: 28px; font-weight: 900; letter-spacing: 1px;
-            background: linear-gradient(180deg, #fff 20%, #555 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-transform: uppercase; margin-bottom: 40px;
-            opacity: 0; animation: fadeUp 1s 0.3s forwards;
-        }
-
         .loader-line {
             width: 140px; height: 3px; background: #222; border-radius: 2px; overflow: hidden;
             position: relative; opacity: 0; animation: fadeIn 1s 0.6s forwards;
         }
         .loader-fill {
             width: 50%; height: 100%; background: var(--primary);
-            position: absolute; left: -50%;
-            animation: load 1.5s infinite;
+            position: absolute; left: -50%; animation: load 1.5s infinite;
             box-shadow: 0 0 10px var(--primary);
         }
-
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
         @keyframes load { 0% { left: -50%; } 100% { left: 100%; } }
 
-        /* --- ЛЕЙАУТ --- */
-        .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.8s; }
-        .scroll-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: calc(var(--nav-height) + 20px); }
+        /* ЛЕЙАУТ */
+        .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.8s; position: relative; z-index: 10; }
+        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: calc(var(--nav-height) + 20px); }
 
-        /* --- ГЛАВНАЯ (HOME) --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-info h1 { margin: 0; font-size: 24px; font-weight: 700; }
-        .user-info p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+        /* ГЛАВНАЯ */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 5px; } /* Поднял выше */
+        .user-info h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .user-info p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
         
         .status-badge {
-            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;
             background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid var(--glass-border);
         }
-        .status-badge.active { background: rgba(50, 215, 75, 0.15); color: var(--success); border-color: rgba(50, 215, 75, 0.3); box-shadow: 0 0 15px rgba(50,215,75,0.2); }
+        .status-badge.active { background: rgba(50, 215, 75, 0.15); color: var(--success); border-color: rgba(50, 215, 75, 0.3); }
         .status-badge.inactive { background: rgba(255, 69, 58, 0.15); color: var(--danger); border-color: rgba(255, 69, 58, 0.3); }
 
         .main-card {
             background: var(--card-bg); border: 1px solid var(--glass-border);
-            border-radius: 28px; padding: 30px; text-align: center; margin-bottom: 20px;
+            border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 15px;
             position: relative; overflow: hidden;
         }
-        .shield-box {
-            width: 120px; height: 120px; margin: 0 auto 20px; position: relative;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .shield-icon { font-size: 65px; color: var(--muted); transition: 0.3s; z-index: 2; position: relative; }
-        .pulse-ring {
-            position: absolute; inset: 0; border-radius: 50%;
-            border: 2px solid transparent; opacity: 0;
-        }
+        .shield-icon { font-size: 55px; color: var(--muted); transition: 0.3s; z-index: 2; position: relative; margin-bottom: 15px;}
         .active .shield-icon { color: var(--primary); filter: drop-shadow(0 0 20px var(--primary-glow)); }
-        .active .pulse-ring { border-color: var(--primary); animation: pulse 2s infinite; }
         
-        .status-text { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .status-sub { font-size: 13px; color: var(--muted); }
+        .status-text { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .status-sub { font-size: 12px; color: var(--muted); }
 
-        @keyframes pulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .stat-item {
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 15px; text-align: center;
+            border-radius: 14px; padding: 12px; text-align: center;
         }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-        .stat-val { font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+        .stat-val { font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
+        /* КЛЮЧ */
         .key-section { 
             background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border);
-            border-radius: 16px; padding: 15px; margin-bottom: 20px; display: none;
+            border-radius: 16px; padding: 15px; margin-bottom: 15px; display: none;
         }
         .key-val { 
             font-family: monospace; font-size: 12px; color: #fff; 
@@ -124,51 +108,46 @@
         }
         .copy-btn {
             width: 100%; background: var(--primary); border: none; color: #fff;
-            padding: 10px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer;
+            padding: 10px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer;
         }
 
+        /* КНОПКИ */
         .main-btn {
-            width: 100%; padding: 18px; border-radius: 20px; border: none;
+            width: 100%; padding: 16px; border-radius: 18px; border: none;
             background: linear-gradient(135deg, #333, #111); color: #fff;
-            font-size: 16px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            transition: 0.3s; cursor: pointer;
+            font-size: 15px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: 0.3s; cursor: pointer; margin-bottom: 10px;
         }
         .active-mode .main-btn { background: linear-gradient(135deg, var(--primary), #0051ff); box-shadow: 0 8px 25px var(--primary-glow); }
         .main-btn:active { transform: scale(0.98); }
 
-        /* --- ПРОФИЛЬ --- */
+        .trial-btn {
+            width: 100%; padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05); color: #fff; font-size: 13px; font-weight: 600;
+            cursor: pointer; display: none; /* Скрыта, если активен */
+        }
+
+        /* ПРОФИЛЬ */
         .profile-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .row:last-child { border: none; }
-        .row-l { color: var(--muted); font-size: 14px; }
-        .row-r { font-weight: 600; font-size: 14px; }
+        .row-l { color: var(--muted); font-size: 13px; }
+        .row-r { font-weight: 600; font-size: 13px; }
 
-        /* --- ГАЙД (ОБНОВЛЕННЫЕ ССЫЛКИ) --- */
-        .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        /* ГАЙД */
+        .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .dl-card {
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
             text-align: center; text-decoration: none; color: #fff; border: 1px solid var(--glass-border);
-            transition: 0.2s;
         }
-        .dl-card:active { background: rgba(255,255,255,0.1); }
-        .dl-icon { font-size: 24px; margin-bottom: 8px; display: block; }
-        .dl-name { font-size: 13px; font-weight: 600; }
+        .dl-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+        .dl-name { font-size: 12px; font-weight: 600; }
         .dl-full { grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        .step-list { margin: 0; padding: 0; list-style: none; }
-        .step-li { display: flex; gap: 15px; margin-bottom: 20px; }
-        .step-n {
-            width: 28px; height: 28px; background: var(--primary); color: #000;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px; flex-shrink: 0;
-        }
-        .step-txt { font-size: 13px; color: var(--muted); line-height: 1.5; }
-        .step-txt strong { color: #fff; }
-
-        /* --- НАВИГАЦИЯ --- */
+        /* НАВИГАЦИЯ */
         .nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
-            background: rgba(10, 10, 12, 0.9); backdrop-filter: blur(20px);
+            background: rgba(10, 10, 12, 0.95); backdrop-filter: blur(20px);
             border-top: 1px solid var(--glass-border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 100; padding-bottom: env(safe-area-inset-bottom);
@@ -189,9 +168,10 @@
 </head>
 <body>
 
+    <canvas id="snow-canvas"></canvas>
+
     <div id="splash">
         <img src="logo.png.png" class="splash-logo" alt="Novochek VPN">
-        <div class="splash-title">NOVOCHEK VPN</div>
         <div class="loader-line"><div class="loader-fill"></div></div>
     </div>
 
@@ -208,12 +188,9 @@
                 </div>
 
                 <div class="main-card" id="mCard">
-                    <div class="shield-box">
-                        <div class="pulse-ring"></div>
-                        <i class="fas fa-shield-alt shield-icon" id="shIcon"></i>
-                    </div>
+                    <i class="fas fa-shield-alt shield-icon" id="shIcon"></i>
                     <div class="status-text" id="stTitle">Вы не защищены</div>
-                    <div class="status-sub" id="stDesc">Нажмите кнопку ниже</div>
+                    <div class="status-sub" id="stDesc">Трафик не зашифрован</div>
                 </div>
 
                 <div class="stats-grid">
@@ -242,6 +219,7 @@
                 </div>
 
                 <button class="main-btn" id="actBtn" onclick="buy()">КУПИТЬ ДОСТУП</button>
+                <button class="trial-btn" id="trialBtn" onclick="trial()">🎁 ПОПРОБОВАТЬ БЕСПЛАТНО</button>
             </div>
 
             <div id="p-profile" class="page">
@@ -265,7 +243,7 @@
                     </div>
                 </div>
                 
-                <h3 style="font-size:16px; margin:20px 0 10px 0">Поддержка</h3>
+                <h3 style="font-size:16px; margin:20px 0 10px 0">Помощь</h3>
                 <div class="dl-card dl-full" onclick="tg.openTelegramLink('https://t.me/Ajdaha61')" style="cursor:pointer">
                     <i class="fab fa-telegram-plane" style="font-size:20px; color:#2cabff"></i>
                     <span>Написать администратору</span>
@@ -273,7 +251,7 @@
             </div>
 
             <div id="p-guide" class="page">
-                <h2 style="margin-bottom:20px">Скачать приложение</h2>
+                <h2 style="margin-bottom:20px">Приложения</h2>
                 
                 <div class="dl-grid">
                     <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="dl-card">
@@ -290,26 +268,14 @@
                     </a>
                 </div>
 
-                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:16px; margin-top:20px;">
-                    <h3 style="margin:0 0 15px 0; font-size:16px">Инструкция по подключению</h3>
-                    <ul class="step-list">
-                        <li class="step-li">
-                            <div class="step-n">1</div>
-                            <div class="step-txt">Скачайте и установите приложение для вашего устройства по кнопкам выше.</div>
-                        </li>
-                        <li class="step-li">
-                            <div class="step-n">2</div>
-                            <div class="step-txt">Перейдите на вкладку <strong>Главная</strong> в этом боте. Если подписка активна, там появится ваш <strong>Ключ доступа</strong>. Нажмите кнопку "Скопировать".</div>
-                        </li>
-                        <li class="step-li">
-                            <div class="step-n">3</div>
-                            <div class="step-txt">Откройте скачанное приложение (Hiddify/V2RayTun). Приложение автоматически предложит добавить ключ из буфера обмена. Если нет — нажмите кнопку <strong>Import from Clipboard</strong> или <strong>Добавить</strong>.</div>
-                        </li>
-                        <li class="step-li">
-                            <div class="step-n">4</div>
-                            <div class="step-txt">Нажмите большую кнопку <strong>Подключить (Connect)</strong>. Готово! Вы великолепны.</div>
-                        </li>
-                    </ul>
+                <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-top:20px;">
+                    <h3 style="margin:0 0 10px 0; font-size:16px">Инструкция</h3>
+                    <ol style="margin:0; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.6">
+                        <li>Установите приложение для вашего устройства по кнопкам выше.</li>
+                        <li>На вкладке <b>Главная</b> скопируйте ваш ключ (если подписка активна).</li>
+                        <li>Запустите приложение и нажмите <b>Import from Clipboard</b> (или "Добавить из буфера").</li>
+                        <li>Нажмите большую кнопку подключения.</li>
+                    </ol>
                 </div>
             </div>
 
@@ -332,14 +298,14 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // ДАННЫЕ
+        // --- ДАННЫЕ ОТ БОТА ---
         const params = new URLSearchParams(window.location.search);
         const status = params.get('status');
         const date = params.get('date');
         const key = params.get('key');
         const user = tg.initDataUnsafe.user;
 
-        // ЭЛЕМЕНТЫ UI
+        // --- ЭЛЕМЕНТЫ UI ---
         const ui = {
             name: document.getElementById('uName'),
             badge: document.getElementById('stBadge'),
@@ -348,6 +314,7 @@
             title: document.getElementById('stTitle'),
             desc: document.getElementById('stDesc'),
             btn: document.getElementById('actBtn'),
+            trialBtn: document.getElementById('trialBtn'),
             keyArea: document.getElementById('keyArea'),
             keyTxt: document.getElementById('keyTxt'),
             pName: document.getElementById('profName'),
@@ -357,14 +324,13 @@
             mainSection: document.getElementById('p-home')
         };
 
-        // ЗАПОЛНЕНИЕ ДАННЫХ
         if(user) {
             ui.name.innerText = `Привет, ${user.first_name}!`;
             ui.pName.innerText = user.first_name;
             ui.pId.innerText = user.id;
         }
 
-        // IP DETECT
+        // IP CHECK
         fetch('https://ipwho.is/')
             .then(r => r.json())
             .then(d => {
@@ -376,7 +342,7 @@
                 document.getElementById('myLoc').innerText = "-";
             });
 
-        // ЛОГИКА СТАТУСА
+        // --- ЛОГИКА ---
         if(status === 'active') {
             ui.badge.innerText = "PREMIUM ACTIVE";
             ui.badge.className = "status-badge active";
@@ -388,6 +354,7 @@
             
             ui.btn.innerText = "ПРОДЛИТЬ ПОДПИСКУ";
             ui.mainSection.classList.add('active-mode');
+            ui.trialBtn.style.display = "none"; // Скрываем пробник
 
             ui.pStat.innerText = "Активна";
             ui.pStat.style.color = "var(--success)";
@@ -400,24 +367,29 @@
         } else {
             ui.badge.innerText = "НЕ АКТИВЕН";
             ui.badge.className = "status-badge inactive";
-            
             ui.card.classList.remove('active');
             ui.icon.className = "fas fa-shield-alt shield-icon";
             ui.title.innerText = "Вы не защищены";
-            ui.desc.innerText = "Трафик не шифруется";
-            ui.btn.innerText = "ПОЛУЧИТЬ ДОСТУП — 129₽";
+            ui.desc.innerText = "Подключите VPN для безопасности";
             
+            ui.btn.innerText = "КУПИТЬ ДОСТУП — 129₽";
+            ui.trialBtn.style.display = "block"; // Показываем пробник
+
             ui.pStat.innerText = "Не активна";
             ui.pStat.style.color = "var(--danger)";
         }
 
-        // КЛИК ПО КНОПКЕ (ОТПРАВЛЯЕМ БОТУ И ЗАКРЫВАЕМ)
+        // --- ДЕЙСТВИЯ ---
         function buy() {
             tg.HapticFeedback.impactOccurred('heavy');
-            // ЭТО ОТПРАВЛЯЕТ ДАННЫЕ БОТУ
             tg.sendData(JSON.stringify({ action: "buy" }));
-            // ЭТО ЗАКРЫВАЕТ ОКНО (На всякий случай, хотя sendData обычно сам закрывает)
-            // tg.close(); 
+            tg.close(); // Закрываем, чтобы юзер увидел счет
+        }
+
+        function trial() {
+            tg.HapticFeedback.impactOccurred('medium');
+            tg.sendData(JSON.stringify({ action: "trial" }));
+            tg.close();
         }
 
         function copyKey() {
@@ -436,13 +408,26 @@
             el.classList.add('active');
         }
 
+        // --- СНЕГ JS ---
+        (function() {
+            const c = document.getElementById('snow-canvas'), ctx = c.getContext('2d');
+            let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
+            const flakes = Array.from({length: 40}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.5, s: Math.random()*0.5+0.2}));
+            function loop() {
+                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.beginPath();
+                flakes.forEach(f => { f.y += f.s; f.x += Math.sin(f.y/30)*0.2; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
+                ctx.fill(); requestAnimationFrame(loop);
+            }
+            loop();
+        })();
+
         // ЗАПУСК
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('splash').style.opacity = 0;
                 document.getElementById('app').style.opacity = 1;
                 setTimeout(() => document.getElementById('splash').style.display = 'none', 600);
-            }, 2500);
+            }, 2000);
         }
     </script>
 </body>
