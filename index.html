@@ -6,23 +6,22 @@
     <title>Novochek VPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #050505;
-            --card-bg: rgba(20, 20, 25, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(20, 20, 25, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --primary: #2cabff;
-            --primary-glow: rgba(44, 171, 255, 0.4);
             --success: #32d74b;
             --danger: #ff453a;
             --text: #ffffff;
             --muted: #8e8e93;
-            --nav-height: 75px;
+            --nav-height: 70px;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif; /* НОВЫЙ ШРИФТ */
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             background-image: radial-gradient(circle at 50% -20%, #151530 0%, #000000 80%);
             color: var(--text);
@@ -31,123 +30,101 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ❄️ СНЕГ (ВЕРНУЛСЯ!) */
-        #snow-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; opacity: 0.4;
-        }
+        /* ❄️ СНЕГ */
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.3; }
 
-        /* ЗАГРУЗКА */
+        /* 🎬 ЗАГРУЗКА */
         #splash {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease;
         }
-        .splash-logo {
-            width: 160px; height: auto; margin-bottom: 25px;
-            filter: drop-shadow(0 0 30px rgba(44, 171, 255, 0.3));
-            animation: breathe 3s infinite ease-in-out;
+        .splash-logo { width: 140px; margin-bottom: 15px; animation: pulse 2s infinite; }
+        .splash-text { 
+            font-family: 'Russo One', sans-serif; font-size: 28px; 
+            background: linear-gradient(180deg, #fff, #888); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        .loader-line {
-            width: 140px; height: 3px; background: #222; border-radius: 2px; overflow: hidden;
-            position: relative; opacity: 0; animation: fadeIn 1s 0.6s forwards;
-        }
-        .loader-fill {
-            width: 50%; height: 100%; background: var(--primary);
-            position: absolute; left: -50%; animation: load 1.5s infinite;
-            box-shadow: 0 0 10px var(--primary);
-        }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes load { 0% { left: -50%; } 100% { left: 100%; } }
 
         /* ЛЕЙАУТ */
-        .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.8s; position: relative; z-index: 10; }
-        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: calc(var(--nav-height) + 20px); }
+        .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.5s; position: relative; z-index: 10; }
+        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
 
-        /* ГЛАВНАЯ */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 5px; } /* Поднял выше */
-        .user-info h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .user-info p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
-        
-        .status-badge {
-            padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid var(--glass-border);
+        /* ЗАГОЛОВОК */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-top: 5px; }
+        .user-name { font-size: 22px; font-weight: 800; }
+        .status-badge { 
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; 
+            border: 1px solid var(--glass-border); text-transform: uppercase;
         }
-        .status-badge.active { background: rgba(50, 215, 75, 0.15); color: var(--success); border-color: rgba(50, 215, 75, 0.3); }
-        .status-badge.inactive { background: rgba(255, 69, 58, 0.15); color: var(--danger); border-color: rgba(255, 69, 58, 0.3); }
+        .status-badge.active { color: var(--success); background: rgba(50,215,75,0.1); border-color: var(--success); }
+        .status-badge.inactive { color: var(--danger); background: rgba(255,69,58,0.1); border-color: var(--danger); }
 
+        /* ГЛАВНАЯ КАРТОЧКА */
         .main-card {
             background: var(--card-bg); border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 15px;
+            border-radius: 24px; padding: 30px 20px; text-align: center; margin-bottom: 20px;
             position: relative; overflow: hidden;
         }
-        .shield-icon { font-size: 55px; color: var(--muted); transition: 0.3s; z-index: 2; position: relative; margin-bottom: 15px;}
-        .active .shield-icon { color: var(--primary); filter: drop-shadow(0 0 20px var(--primary-glow)); }
+        .shield-icon { font-size: 60px; margin-bottom: 15px; display: block; color: var(--muted); transition: 0.3s; }
+        .active .shield-icon { color: var(--primary); filter: drop-shadow(0 0 20px var(--primary)); }
         
-        .status-text { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-        .status-sub { font-size: 12px; color: var(--muted); }
+        .main-title { font-family: 'Russo One', sans-serif; font-size: 20px; margin-bottom: 5px; }
+        .main-sub { font-size: 13px; color: var(--muted); }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .stat-item {
+        /* ИНФО ПАНЕЛЬ */
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box {
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-            border-radius: 14px; padding: 12px; text-align: center;
+            border-radius: 16px; padding: 12px; text-align: center;
         }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-        .stat-val { font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+        .stat-val { font-size: 14px; font-weight: 700; }
 
         /* КЛЮЧ */
-        .key-section { 
-            background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border);
-            border-radius: 16px; padding: 15px; margin-bottom: 15px; display: none;
+        .key-box {
+            background: rgba(0,0,0,0.3); border: 1px dashed var(--primary);
+            border-radius: 16px; padding: 15px; margin-bottom: 20px; display: none;
         }
-        .key-val { 
-            font-family: monospace; font-size: 12px; color: #fff; 
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
+        .key-txt {
+            font-family: monospace; font-size: 12px; color: #fff;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;
         }
         .copy-btn {
-            width: 100%; background: var(--primary); border: none; color: #fff;
-            padding: 10px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer;
+            width: 100%; background: var(--primary); color: #fff; border: none;
+            padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;
         }
 
-        /* КНОПКИ */
-        .main-btn {
-            width: 100%; padding: 16px; border-radius: 18px; border: none;
-            background: linear-gradient(135deg, #333, #111); color: #fff;
-            font-size: 15px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            transition: 0.3s; cursor: pointer; margin-bottom: 10px;
+        /* ГЛАВНЫЕ КНОПКИ */
+        .btn-large {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 18px; border-radius: 18px; border: none;
+            font-size: 16px; font-weight: 700; color: #fff; cursor: pointer;
+            margin-bottom: 12px; transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .active-mode .main-btn { background: linear-gradient(135deg, var(--primary), #0051ff); box-shadow: 0 8px 25px var(--primary-glow); }
-        .main-btn:active { transform: scale(0.98); }
+        .btn-primary { background: linear-gradient(135deg, #007aff, #0051ff); }
+        .btn-trial { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); }
+        .btn-large:active { transform: scale(0.98); }
 
-        .trial-btn {
-            width: 100%; padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05); color: #fff; font-size: 13px; font-weight: 600;
-            cursor: pointer; display: none; /* Скрыта, если активен */
+        /* ИНСТРУКЦИЯ */
+        .dl-btn {
+            display: flex; align-items: center; gap: 15px;
+            background: var(--card-bg); border: 1px solid var(--glass-border);
+            padding: 16px; border-radius: 18px; text-decoration: none; color: #fff;
+            margin-bottom: 10px; transition: 0.2s;
         }
-
-        /* ПРОФИЛЬ */
-        .profile-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
-        .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .row:last-child { border: none; }
-        .row-l { color: var(--muted); font-size: 13px; }
-        .row-r { font-weight: 600; font-size: 13px; }
-
-        /* ГАЙД */
-        .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .dl-card {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
-            text-align: center; text-decoration: none; color: #fff; border: 1px solid var(--glass-border);
-        }
-        .dl-icon { font-size: 22px; margin-bottom: 6px; display: block; }
-        .dl-name { font-size: 12px; font-weight: 600; }
-        .dl-full { grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .dl-btn:active { background: rgba(255,255,255,0.1); }
+        .dl-icon { font-size: 24px; }
+        .dl-info h4 { margin: 0; font-size: 15px; font-weight: 700; }
+        .dl-info p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
 
         /* НАВИГАЦИЯ */
         .nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
-            background: rgba(10, 10, 12, 0.95); backdrop-filter: blur(20px);
+            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(20px);
             border-top: 1px solid var(--glass-border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 100; padding-bottom: env(safe-area-inset-bottom);
@@ -158,11 +135,12 @@
             font-size: 10px; font-weight: 600; padding: 10px; flex: 1;
         }
         .nav-btn.active { color: var(--primary); }
-        .nav-btn i { font-size: 20px; margin-bottom: 2px; }
+        .nav-btn i { font-size: 20px; }
 
         .page { display: none; animation: fadeIn 0.3s; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
     </style>
 </head>
@@ -171,8 +149,8 @@
     <canvas id="snow-canvas"></canvas>
 
     <div id="splash">
-        <img src="logo.png.png" class="splash-logo" alt="Novochek VPN">
-        <div class="loader-line"><div class="loader-fill"></div></div>
+        <img src="logo.png.png" class="splash-logo" alt="Logo">
+        <div class="splash-text">NOVOCHEK VPN</div>
     </div>
 
     <div class="app-view" id="app">
@@ -180,101 +158,104 @@
             
             <div id="p-home" class="page active">
                 <div class="header">
-                    <div class="user-info">
-                        <h1 id="uName">...</h1>
-                        <p>Личный кабинет</p>
+                    <div>
+                        <div class="user-name" id="uName">Hello</div>
+                        <div style="font-size:12px; color:var(--muted)">Личный кабинет</div>
                     </div>
-                    <div class="status-badge" id="stBadge">ПРОВЕРКА...</div>
+                    <div class="status-badge inactive" id="stBadge">Checking</div>
                 </div>
 
                 <div class="main-card" id="mCard">
                     <i class="fas fa-shield-alt shield-icon" id="shIcon"></i>
-                    <div class="status-text" id="stTitle">Вы не защищены</div>
-                    <div class="status-sub" id="stDesc">Трафик не зашифрован</div>
+                    <div class="main-title" id="mTitle">ВЫ НЕ ЗАЩИЩЕНЫ</div>
+                    <div class="main-sub" id="mDesc">Трафик не шифруется</div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">IP Адрес</div>
-                        <div class="stat-val" id="myIp"><i class="fas fa-circle-notch fa-spin"></i></div>
+                <div class="grid-stats">
+                    <div class="stat-box">
+                        <div class="stat-lbl">IP Адрес</div>
+                        <div class="stat-val" id="myIp">...</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Страна</div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">Страна</div>
                         <div class="stat-val" id="myLoc">...</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Трафик</div>
-                        <div class="stat-val">∞ GB</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Пинг</div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">Пинг</div>
                         <div class="stat-val" style="color:#32d74b">~24 ms</div>
                     </div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">Трафик</div>
+                        <div class="stat-val">∞</div>
+                    </div>
                 </div>
 
-                <div class="key-section" id="keyArea">
-                    <div class="stat-label" style="text-align:left; color:var(--primary)">КЛЮЧ ДОСТУПА</div>
-                    <div class="key-val" id="keyTxt">...</div>
-                    <button class="copy-btn" onclick="copyKey()"><i class="fas fa-copy"></i> СКОПИРОВАТЬ</button>
+                <div class="key-box" id="keyArea">
+                    <div class="stat-lbl" style="color:var(--primary); margin-bottom:8px;">ВАШ КЛЮЧ ДОСТУПА</div>
+                    <div class="key-txt" id="keyTxt">...</div>
+                    <button class="copy-btn" onclick="copyKey()">СКОПИРОВАТЬ КЛЮЧ</button>
                 </div>
 
-                <button class="main-btn" id="actBtn" onclick="buy()">КУПИТЬ ДОСТУП</button>
-                <button class="trial-btn" id="trialBtn" onclick="trial()">🎁 ПОПРОБОВАТЬ БЕСПЛАТНО</button>
+                <button class="btn-large btn-primary" id="mainBtn" onclick="buy()">
+                    <i class="fas fa-bolt"></i> КУПИТЬ ДОСТУП
+                </button>
+                <button class="btn-large btn-trial" id="trialBtn" onclick="trial()">
+                    🎁 ПОПРОБОВАТЬ БЕСПЛАТНО
+                </button>
             </div>
 
             <div id="p-profile" class="page">
-                <h2 style="margin-bottom:20px">Аккаунт</h2>
-                <div class="profile-card">
-                    <div class="row">
-                        <span class="row-l">ID</span>
-                        <span class="row-r" id="profId">...</span>
+                <h2 style="margin-bottom:20px; font-family:'Russo One', sans-serif;">АККАУНТ</h2>
+                <div style="background:var(--card-bg); border-radius:18px; padding:20px; border:1px solid var(--glass-border);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
+                        <span style="color:var(--muted); font-size:14px;">ID</span>
+                        <span style="font-weight:700" id="profId">...</span>
                     </div>
-                    <div class="row">
-                        <span class="row-l">Имя</span>
-                        <span class="row-r" id="profName">...</span>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <span style="color:var(--muted); font-size:14px;">Статус</span>
+                        <span style="font-weight:700; color:var(--danger)" id="profStat">Не активен</span>
                     </div>
-                    <div class="row">
-                        <span class="row-l">Статус</span>
-                        <span class="row-r" id="profStat" style="color:var(--danger)">Не активен</span>
-                    </div>
-                    <div class="row">
-                        <span class="row-l">Истекает</span>
-                        <span class="row-r" id="profDate">-</span>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--muted); font-size:14px;">Истекает</span>
+                        <span style="font-weight:700" id="profDate">-</span>
                     </div>
                 </div>
                 
-                <h3 style="font-size:16px; margin:20px 0 10px 0">Помощь</h3>
-                <div class="dl-card dl-full" onclick="tg.openTelegramLink('https://t.me/Ajdaha61')" style="cursor:pointer">
-                    <i class="fab fa-telegram-plane" style="font-size:20px; color:#2cabff"></i>
-                    <span>Написать администратору</span>
+                <h3 style="margin:25px 0 15px 0; font-size:16px;">Поддержка</h3>
+                <div class="dl-btn" onclick="tg.openTelegramLink('https://t.me/Ajdaha61')">
+                    <i class="fab fa-telegram-plane dl-icon" style="color:#2cabff"></i>
+                    <div class="dl-info">
+                        <h4>Написать в поддержку</h4>
+                        <p>По любым вопросам</p>
+                    </div>
                 </div>
             </div>
 
             <div id="p-guide" class="page">
-                <h2 style="margin-bottom:20px">Приложения</h2>
+                <h2 style="margin-bottom:20px; font-family:'Russo One', sans-serif;">СКАЧАТЬ</h2>
                 
-                <div class="dl-grid">
-                    <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="dl-card">
-                        <i class="fab fa-apple dl-icon"></i>
-                        <span class="dl-name">iOS (V2RayTun)</span>
-                    </a>
-                    <a href="https://play.google.com/store/apps/details?id=app.hiddify.com" class="dl-card">
-                        <i class="fab fa-android dl-icon" style="color:#32d74b"></i>
-                        <span class="dl-name">Android (Hiddify)</span>
-                    </a>
-                    <a href="https://happ.help/?etext=2202.uMhAMTmHp_-6_vvs2cI7kWJ3c29udWxtYXR4bWhueHY.449955844ef1cfe284ede8115b1efd9e0275735b&yclid=15475165576117616639" class="dl-card dl-full">
-                        <i class="fas fa-desktop dl-icon" style="color:#2cabff"></i>
-                        <span class="dl-name">Windows (Happ)</span>
-                    </a>
-                </div>
+                <a href="https://apps.apple.com/ru/app/v2raytun/id6476628951" class="dl-btn">
+                    <i class="fab fa-apple dl-icon"></i>
+                    <div class="dl-info"><h4>iOS (iPhone)</h4><p>Скачать V2RayTun</p></div>
+                </a>
+                
+                <a href="https://play.google.com/store/apps/details?id=app.hiddify.com" class="dl-btn">
+                    <i class="fab fa-android dl-icon" style="color:#32d74b"></i>
+                    <div class="dl-info"><h4>Android</h4><p>Скачать Hiddify</p></div>
+                </a>
 
-                <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-top:20px;">
-                    <h3 style="margin:0 0 10px 0; font-size:16px">Инструкция</h3>
+                <a href="https://happ.help/?etext=2202.uMhAMTmHp_-6_vvs2cI7kWJ3c29udWxtYXR4bWhueHY.449955844ef1cfe284ede8115b1efd9e0275735b&yclid=15475165576117616639" class="dl-btn">
+                    <i class="fas fa-desktop dl-icon" style="color:#2cabff"></i>
+                    <div class="dl-info"><h4>Windows PC</h4><p>Скачать Happ</p></div>
+                </a>
+
+                <div style="margin-top:20px; padding:15px; background:rgba(255,255,255,0.05); border-radius:16px;">
+                    <h4 style="margin:0 0 10px 0">Инструкция:</h4>
                     <ol style="margin:0; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.6">
-                        <li>Установите приложение для вашего устройства по кнопкам выше.</li>
-                        <li>На вкладке <b>Главная</b> скопируйте ваш ключ (если подписка активна).</li>
-                        <li>Запустите приложение и нажмите <b>Import from Clipboard</b> (или "Добавить из буфера").</li>
-                        <li>Нажмите большую кнопку подключения.</li>
+                        <li>Установите приложение.</li>
+                        <li>На вкладке <b>Главная</b> скопируйте ключ.</li>
+                        <li>В приложении нажмите <b>Import from Clipboard</b>.</li>
+                        <li>Нажмите кнопку подключения.</li>
                     </ol>
                 </div>
             </div>
@@ -283,7 +264,7 @@
 
         <nav class="nav">
             <button class="nav-btn active" onclick="tab('p-home', this)">
-                <i class="fas fa-home"></i> <span>Главная</span>
+                <i class="fas fa-shield-alt"></i> <span>Главная</span>
             </button>
             <button class="nav-btn" onclick="tab('p-profile', this)">
                 <i class="fas fa-user"></i> <span>Профиль</span>
@@ -298,26 +279,25 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- ДАННЫЕ ОТ БОТА ---
+        // Данные
         const params = new URLSearchParams(window.location.search);
         const status = params.get('status');
         const date = params.get('date');
         const key = params.get('key');
         const user = tg.initDataUnsafe.user;
 
-        // --- ЭЛЕМЕНТЫ UI ---
+        // UI Элементы
         const ui = {
             name: document.getElementById('uName'),
             badge: document.getElementById('stBadge'),
             card: document.getElementById('mCard'),
             icon: document.getElementById('shIcon'),
-            title: document.getElementById('stTitle'),
-            desc: document.getElementById('stDesc'),
-            btn: document.getElementById('actBtn'),
+            title: document.getElementById('mTitle'),
+            desc: document.getElementById('mDesc'),
+            mainBtn: document.getElementById('mainBtn'),
             trialBtn: document.getElementById('trialBtn'),
             keyArea: document.getElementById('keyArea'),
             keyTxt: document.getElementById('keyTxt'),
-            pName: document.getElementById('profName'),
             pId: document.getElementById('profId'),
             pStat: document.getElementById('profStat'),
             pDate: document.getElementById('profDate'),
@@ -326,11 +306,10 @@
 
         if(user) {
             ui.name.innerText = `Привет, ${user.first_name}!`;
-            ui.pName.innerText = user.first_name;
             ui.pId.innerText = user.id;
         }
 
-        // IP CHECK
+        // IP Detect
         fetch('https://ipwho.is/')
             .then(r => r.json())
             .then(d => {
@@ -338,52 +317,52 @@
                 document.getElementById('myLoc').innerText = d.country_code;
             })
             .catch(() => {
-                document.getElementById('myIp').innerText = "Скрыт";
-                document.getElementById('myLoc').innerText = "-";
+                document.getElementById('myIp').innerText = "?";
+                document.getElementById('myLoc').innerText = "?";
             });
 
-        // --- ЛОГИКА ---
+        // Логика
         if(status === 'active') {
-            ui.badge.innerText = "PREMIUM ACTIVE";
+            ui.badge.innerText = "ACTIVE";
             ui.badge.className = "status-badge active";
             
             ui.card.classList.add('active');
             ui.icon.className = "fas fa-check-circle shield-icon";
-            ui.title.innerText = "Защита активна";
-            ui.desc.innerText = "Подписка до: " + date;
+            ui.title.innerText = "ЗАЩИТА АКТИВНА";
+            ui.desc.innerText = "Трафик зашифрован";
             
-            ui.btn.innerText = "ПРОДЛИТЬ ПОДПИСКУ";
-            ui.mainSection.classList.add('active-mode');
-            ui.trialBtn.style.display = "none"; // Скрываем пробник
+            ui.mainBtn.innerText = "ПРОДЛИТЬ ПОДПИСКУ";
+            ui.trialBtn.style.display = "none";
 
             ui.pStat.innerText = "Активна";
-            ui.pStat.style.color = "var(--success)";
+            ui.pStat.style.color = "#32d74b";
             ui.pDate.innerText = date;
 
             if(key) {
-                ui.keyArea.style.display = 'block';
+                ui.keyArea.style.display = "block";
                 ui.keyTxt.innerText = key;
             }
         } else {
-            ui.badge.innerText = "НЕ АКТИВЕН";
+            ui.badge.innerText = "INACTIVE";
             ui.badge.className = "status-badge inactive";
+            
             ui.card.classList.remove('active');
             ui.icon.className = "fas fa-shield-alt shield-icon";
-            ui.title.innerText = "Вы не защищены";
-            ui.desc.innerText = "Подключите VPN для безопасности";
+            ui.title.innerText = "ВЫ НЕ ЗАЩИЩЕНЫ";
+            ui.desc.innerText = "Подписка не активна";
             
-            ui.btn.innerText = "КУПИТЬ ДОСТУП — 129₽";
-            ui.trialBtn.style.display = "block"; // Показываем пробник
+            ui.mainBtn.innerText = "КУПИТЬ ДОСТУП — 129₽";
+            ui.trialBtn.style.display = "flex";
 
             ui.pStat.innerText = "Не активна";
-            ui.pStat.style.color = "var(--danger)";
+            ui.pStat.style.color = "#ff453a";
         }
 
-        // --- ДЕЙСТВИЯ ---
+        // Функции кнопок
         function buy() {
             tg.HapticFeedback.impactOccurred('heavy');
             tg.sendData(JSON.stringify({ action: "buy" }));
-            tg.close(); // Закрываем, чтобы юзер увидел счет
+            tg.close();
         }
 
         function trial() {
@@ -408,26 +387,26 @@
             el.classList.add('active');
         }
 
-        // --- СНЕГ JS ---
+        // Снег
         (function() {
             const c = document.getElementById('snow-canvas'), ctx = c.getContext('2d');
             let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
-            const flakes = Array.from({length: 40}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.5, s: Math.random()*0.5+0.2}));
+            const flakes = Array.from({length: 35}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.5, s: Math.random()*0.5+0.2}));
             function loop() {
-                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.beginPath();
+                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.beginPath();
                 flakes.forEach(f => { f.y += f.s; f.x += Math.sin(f.y/30)*0.2; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
                 ctx.fill(); requestAnimationFrame(loop);
             }
             loop();
         })();
 
-        // ЗАПУСК
+        // Запуск
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('splash').style.opacity = 0;
                 document.getElementById('app').style.opacity = 1;
                 setTimeout(() => document.getElementById('splash').style.display = 'none', 600);
-            }, 2000);
+            }, 2500);
         }
     </script>
 </body>
