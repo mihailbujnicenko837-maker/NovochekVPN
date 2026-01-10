@@ -30,7 +30,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.9; }
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.8; }
 
         #splash {
             position: fixed; inset: 0; background: #000; z-index: 10000;
@@ -38,15 +38,11 @@
             transition: opacity 0.5s ease;
         }
         .splash-logo { width: 150px; margin-bottom: 20px; animation: breathe 3s infinite; }
-        .splash-text { 
-            font-family: 'Russo One', sans-serif; font-size: 32px; 
-            background: linear-gradient(180deg, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px;
-        }
-        .loading-bar { width: 150px; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
-        .loading-progress { width: 50%; height: 100%; background: var(--primary); animation: load 1.5s infinite ease-in-out; }
+        .splash-text { font-family: 'Russo One', sans-serif; font-size: 32px; background: linear-gradient(180deg, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; }
+        .loading-bar-container { width: 60%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
+        .loading-bar { width: 100%; height: 100%; background: var(--primary); transform: translateX(-100%); animation: load 2s forwards; }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        @keyframes load { to { transform: translateX(0); } }
 
         .app-view { display: flex; flex-direction: column; height: 100%; opacity: 0; transition: opacity 0.5s; position: relative; z-index: 10; }
         .scroll-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
@@ -111,7 +107,7 @@
     <div id="splash">
         <img src="logo.png.png" class="splash-logo" alt="Logo">
         <div class="splash-text">NOVOCHEK VPN</div>
-        <div class="loading-bar"><div class="loading-progress"></div></div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
     </div>
 
     <div class="app-view" id="app">
@@ -121,9 +117,9 @@
                 <div class="header">
                     <div>
                         <div class="user-name" id="uName">...</div>
-                        <div class="user-sub">Главная</div>
+                        <div style="font-size:13px; color:var(--muted)">Личный кабинет</div>
                     </div>
-                    <div class="status-badge" id="stBadge">...</div>
+                    <div class="status-badge inactive" id="stBadge">...</div>
                 </div>
 
                 <div class="main-card inactive" id="mCard">
@@ -155,7 +151,7 @@
                 <h2 style="margin-bottom:20px; font-family:'Russo One', sans-serif;">ПРОФИЛЬ</h2>
                 <div class="profile-box">
                     <div class="prof-row"><span class="prof-l"><i class="fas fa-id-card"></i> ID</span><span class="prof-r" id="profId">...</span></div>
-                    <div class="prof-row"><span class="prof-l"><i class="fas fa-user"></i> Имя</span><span class="prof-r" id="profName">...</span></div>
+                    <div class="prof-row"><span class="prof-l"><i class="fas fa-user-circle"></i> Имя</span><span class="prof-r" id="profName">...</span></div>
                     <div class="prof-row"><span class="prof-l"><i class="fas fa-toggle-on"></i> Статус</span><span class="prof-r" id="profStat">...</span></div>
                     <div class="prof-row"><span class="prof-l"><i class="fas fa-hourglass-half"></i> Истекает</span><span class="prof-r" id="profDate">-</span></div>
                 </div>
@@ -231,12 +227,12 @@
             ui.badge.innerText = "ACTIVE";
             ui.badge.className = "status-badge active";
             ui.card.className = "main-card active";
-            ui.title.innerText = "ЗАЩИТА АКТИВНА";
-            ui.desc.innerText = "Ваш трафик зашифрован 🔒";
-            ui.btn.innerHTML = '<i class="fas fa-sync"></i> ПРОДЛИТЬ ПОДПИСКУ';
+            ui.title.innerText = "ЗАЩИТА АКТИВНА 💙";
+            ui.desc.innerText = "Трафик зашифрован";
+            ui.btn.innerHTML = 'ПРОДЛИТЬ ПОДПИСКУ';
             ui.trialBtn.style.display = "none";
             ui.pStat.innerText = "Активна 🟢";
-            ui.pStat.style.color = "var(--success)";
+            ui.pStat.style.color = "#32d74b";
             ui.pDate.innerText = date;
             if(key) {
                 ui.keyArea.style.display = "block";
@@ -246,26 +242,24 @@
             ui.badge.innerText = "INACTIVE";
             ui.badge.className = "status-badge inactive";
             ui.card.className = "main-card inactive";
-            ui.title.innerText = "ЗАЩИТА ОТКЛЮЧЕНА";
-            ui.desc.innerText = "Ваш IP виден всем ⚠️";
-            ui.btn.innerHTML = '<i class="fas fa-bolt"></i> КУПИТЬ ДОСТУП';
+            ui.title.innerText = "ЗАЩИТА ОТКЛЮЧЕНА 💔";
+            ui.desc.innerText = "Ваш IP виден всем";
+            ui.btn.innerHTML = 'КУПИТЬ ДОСТУП';
             ui.trialBtn.style.display = "flex";
             ui.pStat.innerText = "Не активна 🔴";
-            ui.pStat.style.color = "var(--danger)";
+            ui.pStat.style.color = "#ff453a";
         }
 
-        // ВОТ ЗДЕСЬ ГЛАВНОЕ ИЗМЕНЕНИЕ ДЛЯ ОПЛАТЫ
         function buy() {
             tg.HapticFeedback.impactOccurred('heavy');
-            // ОТКРЫВАЕМ БОТА С КОМАНДОЙ /start buy
-            tg.openTelegramLink("https://t.me/NovochekVPN_bot?start=buy");
+            // ОТПРАВЛЯЕМ JSON-DATA БОТУ. БОТ ПОЙМАЕТ ЭТО ЧЕРЕЗ F.web_app_data
+            tg.sendData(JSON.stringify({ action: "buy" }));
             tg.close();
         }
 
         function trial() {
             tg.HapticFeedback.impactOccurred('medium');
-            // ОТКРЫВАЕМ БОТА С КОМАНДОЙ /start trial
-            tg.openTelegramLink("https://t.me/NovochekVPN_bot?start=trial");
+            tg.sendData(JSON.stringify({ action: "trial" }));
             tg.close();
         }
 
@@ -279,8 +273,8 @@
 
         function tab(id, el) {
             tg.HapticFeedback.selectionChanged();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.opacity = 0; setTimeout(()=> p.style.display='none', 200); });
+            setTimeout(() => { const p = document.getElementById(id); p.style.display = 'block'; setTimeout(()=> p.style.opacity = 1, 10); }, 200);
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
         }
@@ -288,10 +282,10 @@
         (function() {
             const c = document.getElementById('snow-canvas'), ctx = c.getContext('2d');
             let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
-            const flakes = Array.from({length: 50}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+1, s: Math.random()*1+0.5}));
+            const flakes = Array.from({length: 30}, () => ({x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+2, s: Math.random()*1+0.5}));
             function loop() {
-                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.beginPath();
-                flakes.forEach(f => { f.y += f.s; f.x += Math.sin(f.y/30)*0.5; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
+                ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.beginPath();
+                flakes.forEach(f => { f.y += f.s; if(f.y>h) f.y=-5; ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); });
                 ctx.fill(); requestAnimationFrame(loop);
             }
             loop();
